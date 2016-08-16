@@ -15,12 +15,19 @@
 # limitations under the License.
 #
 import webapp2
+from validator import valid_month, valid_day, valid_year
 
 form="""
 <p> What's your birthday?</p>
 <form method="post">
     <label>Month
         <input type="text" name="month">
+    </label>
+    <label>Day
+        <input type="text" name="day">
+    </label>
+    <label>Year
+        <input type="text" name="year">
     </label>
     <input type="submit">
 </form>
@@ -32,7 +39,16 @@ class MainHandler(webapp2.RequestHandler):
         self.response.write(form)
 
     def post(self):
-        self.response.write("You submitted for month the value of " + self.request.get("month"))
+        user_month = valid_month(self.request.get("month"))
+        user_day = valid_day(self.request.get("day"))
+        user_year = valid_year(self.request.get("year"))
+        print(user_month, user_day,user_year)
+        # if (user_month and user_day and user_year):
+        #     self.response.write("You submitted the value of " + user_month + " " + user_day + "," + user_year)
+        if (user_month and user_day and user_year):
+            self.response.write("You submitted the value of " + str(user_month) + " " + str(user_day) + "," + str(user_year))
+        else:
+            self.response.write(form)
 
 class FormHandler(webapp2.RequestHandler):
     def post(self):

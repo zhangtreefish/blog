@@ -3,6 +3,7 @@ def valid_day(day):
         if d.isdigit()!=True:
             return None
     return int(day) if int(day) and int(day)<32 else None
+print(valid_day('foo'), valid_day('10'), valid_day('32'))
 
 def valid_year(year):
     return int(year) if year.isdigit()and int(year) >=1900 and int(year) <= 2020 else None

@@ -30,13 +30,16 @@ form="""
         <input type="text" name="year">
     </label>
     <input type="submit">
+    <div style="color:red">{error}</div>
 </form>
 """
 
 class MainHandler(webapp2.RequestHandler):
+    def write_form(self, error=''):
+        self.response.out.write(form.format(error=error))
+
     def get(self):
-        # self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write(form)
+        self.write_form()
 
     def post(self):
         user_month = valid_month(self.request.get("month"))
@@ -46,9 +49,9 @@ class MainHandler(webapp2.RequestHandler):
         # if (user_month and user_day and user_year):
         #     self.response.write("You submitted the value of " + user_month + " " + user_day + "," + user_year)
         if (user_month and user_day and user_year):
-            self.response.write("You submitted the value of " + str(user_month) + " " + str(user_day) + "," + str(user_year))
+            self.response.out.write("You submitted the value of " + str(user_month) + " " + str(user_day) + "," + str(user_year))
         else:
-            self.response.write(form)
+            self.write_form("You entered invalid month, day or year value")
 
 class FormHandler(webapp2.RequestHandler):
     def post(self):

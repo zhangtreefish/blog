@@ -17,8 +17,11 @@
 import webapp2
 
 form="""
-<form action="http://www.google.com/search">
-    <input name="q">
+<p> What's your birthday?</p>
+<form method="post">
+    <label>Month
+        <input type="text" name="month">
+    </label>
     <input type="submit">
 </form>
 """
@@ -28,15 +31,18 @@ class MainHandler(webapp2.RequestHandler):
         # self.response.headers['Content-Type'] = 'text/plain'
         self.response.write(form)
 
+    def post(self):
+        self.response.write("You submitted for month the value of " + self.request.get("month"))
+
 class FormHandler(webapp2.RequestHandler):
-    def get(self):
+    def post(self):
         q = self.request.get("q")
-        self.response.write(q)
+        # self.response.write(q)
         # useful for debug:
-        # self.response.headers['Content-Type'] = 'text/plain'
-        # self.response.out.write(self.request)
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write(self.request)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/test', FormHandler)
+    ('/formTest', FormHandler)
 ], debug=True)

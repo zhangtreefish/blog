@@ -14,54 +14,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import os
 import webapp2
-from validator import valid_month, valid_day, valid_year, escape_html
+import jinja2
 
-form="""
-<p> What's your birthday?</p>
-<form method="post">
-    <label>Month
-        <input type="text" name="month" value="{month}">
-    </label>
-    <label>Day
-        <input type="text" name="day" value="{day}">
-    </label>
-    <label>Year
-        <input type="text" name="year" value="{year}">
-    </label>
-    <div style="color:red">{error}</div>
-    <br>
-    <input type="submit">
-</form>
-"""
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
 
-class MainHandler(webapp2.RequestHandler):
 
-    def write_form(self, error='', month='', day='', year=''):
-        self.response.out.write(form.format(error=error, month=escape_html(month), day=escape_html(day), year=escape_html(year)))
+# food_html=
+# """
+# <input name="food" type="hidden" value="egg">
+# """
+# shopping_list_html=
+# """
+# <h2> Shopping list</h2>
+# <ul>
+# {}
+# </ul>
+# """
+class Handler(webapp2.RequestHandler):
+    def write(self, *a, **kw):
+        self.response.out.write(*a, **kw)
+
+    def render_str(self, template, **params):
+        t = jinja_env.get_template(template) #load template from environment
+        return t.render(**params) # render template with params
+
+    def render(self, template, **kw):
+        self.write(self.render_str(template, **kw))
+
+class MainPage(Handler):
 
     def get(self):
-        self.write_form()
+        self.render('shopping_list.html')
 
-    def post(self):
-        user_month = self.request.get("month")
-        user_day = self.request.get("day")
-        user_year = self.request.get("year")
-        month = valid_month(user_month)
-        day = valid_day(user_day)
-        year = valid_year(user_year)
+    # def post(self):
+    #     user_month = self.request.get("month")
+    #     user_day = self.request.get("day")
+    #     user_year = self.request.get("year")
+    #     month = valid_month(user_month)
+    #     day = valid_day(user_day)
+    #     year = valid_year(user_year)
 
-        if not (month and day and year):
-            self.write_form("You entered invalid value(s) ", user_month , user_day, user_year)
-        else:
-            self.redirect('/thank?month={0}&day={1}&year={2}'.format(user_month, user_day, user_year))
+    #     if not (month and day and year):
+    #         self.write_form("You entered invalid value(s) ", user_month , user_day, user_year)
+    #     else:
+    #         self.redirect('/thank?month={0}&day={1}&year={2}'.format(user_month, user_day, user_year))
 
-class ThankHandler(webapp2.RequestHandler):
-    def get(self):
-        month = self.request.get("month")
-        day = self.request.get("day")
-        year = self.request.get("year")
-        self.response.out.write("You entered the validated value(s) "+ month +' '+ day+', '+ year)
+# class ThankHandler(webapp2.RequestHandler):
+#     def get(self):
+#         month = self.request.get("month")
+#         day = self.request.get("day")
+#         year = self.request.get("year")
+#         self.response.out.write("You entered the validated value(s) "+ month +' '+ day+', '+ year)
 
 class FormHandler(webapp2.RequestHandler):
     def post(self):
@@ -73,7 +79,5 @@ class FormHandler(webapp2.RequestHandler):
 
 # Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/thank', ThankHandler),
-    ('/formTest', FormHandler)
+    ('/', MainPage)
 ], debug=True)

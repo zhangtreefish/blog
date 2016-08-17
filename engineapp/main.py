@@ -15,43 +15,46 @@
 # limitations under the License.
 #
 import webapp2
-from validator import valid_month, valid_day, valid_year
+from validator import valid_month, valid_day, valid_year, escape_html
 
 form="""
 <p> What's your birthday?</p>
 <form method="post">
     <label>Month
-        <input type="text" name="month">
+        <input type="text" name="month" value="{month}">
     </label>
     <label>Day
-        <input type="text" name="day">
+        <input type="text" name="day" value="{day}">
     </label>
     <label>Year
-        <input type="text" name="year">
+        <input type="text" name="year" value="{year}">
     </label>
-    <input type="submit">
     <div style="color:red">{error}</div>
+    <br>
+    <input type="submit">
 </form>
 """
 
 class MainHandler(webapp2.RequestHandler):
-    def write_form(self, error=''):
-        self.response.out.write(form.format(error=error))
+
+    def write_form(self, error='', month='', day='', year=''):
+        self.response.out.write(form.format(error=error, month=escape_html(month), day=escape_html(day), year=escape_html(year)))
 
     def get(self):
         self.write_form()
 
     def post(self):
-        user_month = valid_month(self.request.get("month"))
-        user_day = valid_day(self.request.get("day"))
-        user_year = valid_year(self.request.get("year"))
-        print(user_month, user_day,user_year)
-        # if (user_month and user_day and user_year):
-        #     self.response.write("You submitted the value of " + user_month + " " + user_day + "," + user_year)
-        if (user_month and user_day and user_year):
-            self.response.out.write("You submitted the value of " + str(user_month) + " " + str(user_day) + "," + str(user_year))
+        user_month = self.request.get("month")
+        user_day = self.request.get("day")
+        user_year = self.request.get("year")
+        month = valid_month(user_month)
+        day = valid_day(user_day)
+        year = valid_year(user_year)
+
+        if not (month and day and year):
+            self.write_form("You entered invalid value(s) ", user_month , user_day, user_year)
         else:
-            self.write_form("You entered invalid month, day or year value")
+            self.response.out.write("You entered the validated value(s) "+ user_month +' '+ user_day+', '+ user_year)
 
 class FormHandler(webapp2.RequestHandler):
     def post(self):

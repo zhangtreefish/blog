@@ -54,7 +54,14 @@ class MainHandler(webapp2.RequestHandler):
         if not (month and day and year):
             self.write_form("You entered invalid value(s) ", user_month , user_day, user_year)
         else:
-            self.response.out.write("You entered the validated value(s) "+ user_month +' '+ user_day+', '+ user_year)
+            self.redirect('/thank?month={0}&day={1}&year={2}'.format(user_month, user_day, user_year))
+
+class ThankHandler(webapp2.RequestHandler):
+    def get(self):
+        month = self.request.get("month")
+        day = self.request.get("day")
+        year = self.request.get("year")
+        self.response.out.write("You entered the validated value(s) "+ month +' '+ day+', '+ year)
 
 class FormHandler(webapp2.RequestHandler):
     def post(self):
@@ -64,7 +71,9 @@ class FormHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write(self.request)
 
+# Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/thank', ThankHandler),
     ('/formTest', FormHandler)
 ], debug=True)

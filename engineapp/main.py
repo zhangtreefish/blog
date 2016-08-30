@@ -17,22 +17,25 @@
 import os
 import webapp2
 import jinja2
+import codecs
+import re
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
+# jinja2.6 deos not support lstrip_blocks
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
+                               trim_blocks=True,
+                               # lstrip_blocks=True,
+                               autoescape=True)
+USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+PASSWORD_RE = re.compile(r"^.{3,20}$")
+EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
+def valid_username(username):
+    return USER_RE.match(username)
+def valid_password(password):
+    return USER_RE.match(password)
+def valid_email(email):
+    return USER_RE.match(email)
 
-
-# food_html=
-# """
-# <input name="food" type="hidden" value="egg">
-# """
-# shopping_list_html=
-# """
-# <h2> Shopping list</h2>
-# <ul>
-# {}
-# </ul>
-# """
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -45,11 +48,55 @@ class Handler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
 class MainPage(Handler):
-
     def get(self):
-        self.render('shopping_list.html')
+        foods = self.request.get_all("food")
+        self.render('shopping_list.html', foods=foods)
 
-    # def post(self):
+class FizzBuzzHandler(Handler):
+    def get(self):
+        n = self.request.get("n")
+        n = n and int(n)
+        self.render('fizzbuzz.html', n=n)
+
+class Rot13Handler(Handler):
+    def get(self):
+        # self.render('rot13.html')
+        username = self.request.get('username')
+        self.redirect('/welcome'+'?username='+username)
+
+    def post(self):
+        msg = self.request.get('text')
+        rotted_msg = codecs.encode(msg, 'rot13')
+        self.render('rot13.html', text=rotted_msg)
+
+class WelcomeHandler(Handler):
+    def get(self):
+        username = self.request.get("username")
+        self.render('welcome.html', username=username)
+
+class SignUpHandler(Handler):
+    def get(self):
+        self.render('signup.html')
+
+    def post(self):
+        username_input = self.request.username
+        password_input = self.request.password
+        verify_input = self.request.verify
+        email_input = self.request.email
+        username = username_input and valid_username(username_input)
+
+        password = password_input and valid_password(password_input)
+        verify = verify_input and valid_password(verify_input)
+        email = email_input and valid_email(email_input)
+        # if username and verify and email and password:
+        if True:
+            self.redirect('/welcome', username=username)
+        else:
+            self.render('signup.html')
+
+
+
+            # def post(self):
     #     user_month = self.request.get("month")
     #     user_day = self.request.get("day")
     #     user_year = self.request.get("year")
@@ -79,5 +126,9 @@ class FormHandler(webapp2.RequestHandler):
 
 # Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
-    ('/', MainPage)
+    ('/', MainPage),
+    ('/fizzbuzz', FizzBuzzHandler),
+    ('/rot13', Rot13Handler),
+    ('/welcome', WelcomeHandler),
+    ('/signup', SignUpHandler)
 ], debug=True)

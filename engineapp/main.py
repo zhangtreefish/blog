@@ -26,15 +26,17 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                trim_blocks=True,
                                # lstrip_blocks=True,
                                autoescape=True)
+
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 PASSWORD_RE = re.compile(r"^.{3,20}$")
 EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
+
 def valid_username(username):
     return USER_RE.match(username)
 def valid_password(password):
-    return USER_RE.match(password)
+    return PASSWORD_RE.match(password)
 def valid_email(email):
-    return USER_RE.match(email)
+    return EMAIL_RE.match(email)
 
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
@@ -60,9 +62,7 @@ class FizzBuzzHandler(Handler):
 
 class Rot13Handler(Handler):
     def get(self):
-        # self.render('rot13.html')
-        username = self.request.get('username')
-        self.redirect('/welcome'+'?username='+username)
+        self.render('rot13.html')
 
     def post(self):
         msg = self.request.get('text')
@@ -72,49 +72,43 @@ class Rot13Handler(Handler):
 class WelcomeHandler(Handler):
     def get(self):
         username = self.request.get("username")
-        self.render('welcome.html', username=username)
+        if username:
+            self.render('welcome.html', username=username)
+        else:
+            self.redirect('/signup')
 
 class SignUpHandler(Handler):
     def get(self):
         self.render('signup.html')
 
     def post(self):
-        username_input = self.request.username
-        password_input = self.request.password
-        verify_input = self.request.verify
-        email_input = self.request.email
-        username = username_input and valid_username(username_input)
+        username_input = self.request.get('username')
+        password_input = self.request.get('password')
+        verify_input = self.request.get('verify')
+        email_input = self.request.get('email')
 
-        password = password_input and valid_password(password_input)
-        verify = verify_input and valid_password(verify_input)
-        email = email_input and valid_email(email_input)
-        # if username and verify and email and password:
-        if True:
-            self.redirect('/welcome', username=username)
+        my_kw = {}
+
+        if username_input is None or valid_username(username_input) is None:
+            my_kw['username_err'] = "That's not a valid username."
+
+        if password_input is None or valid_password(password_input) is None:
+            my_kw['password_err'] = "That's not a valid password."
+
+        if verify_input is None or password_input != verify_input:
+            my_kw['verify_err'] = "Your passwords didn't match."
+
+        if email_input and valid_email(email_input) is None:
+            my_kw['email_err'] = "That's not a valid email."
+
+        # empty dict evaluates to False
+        if my_kw:
+            my_kw['username'] = username_input
+            my_kw['email'] = email_input
+            self.render('signup.html', **my_kw)
+
         else:
-            self.render('signup.html')
-
-
-
-            # def post(self):
-    #     user_month = self.request.get("month")
-    #     user_day = self.request.get("day")
-    #     user_year = self.request.get("year")
-    #     month = valid_month(user_month)
-    #     day = valid_day(user_day)
-    #     year = valid_year(user_year)
-
-    #     if not (month and day and year):
-    #         self.write_form("You entered invalid value(s) ", user_month , user_day, user_year)
-    #     else:
-    #         self.redirect('/thank?month={0}&day={1}&year={2}'.format(user_month, user_day, user_year))
-
-# class ThankHandler(webapp2.RequestHandler):
-#     def get(self):
-#         month = self.request.get("month")
-#         day = self.request.get("day")
-#         year = self.request.get("year")
-#         self.response.out.write("You entered the validated value(s) "+ month +' '+ day+', '+ year)
+            self.redirect('/welcome?username={}'.format(username_input))
 
 class FormHandler(webapp2.RequestHandler):
     def post(self):

@@ -20,6 +20,9 @@ import jinja2
 import codecs
 import re
 
+import datetime
+from google.appengine.ext import db
+
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 # jinja2.6 deos not support lstrip_blocks
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
@@ -118,11 +121,65 @@ class FormHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write(self.request)
 
+# ---------Blog project--------------------------
+class BlogPost(db.Model):
+    subject = db.StringProperty(required=True)
+    content = db.TextProperty(required=True)
+    postedAt = db.DateTimeProperty(auto_now_add=True)
+
+class BlogHandler(Handler):
+    def get(self):
+        all_posts = BlogPost.all()  # Model.all (keys_only=False)
+        self.render('blog_front.html', posts=all_posts)
+
+class NewPostHandler(Handler):
+    def get(self):
+        self.render('new_post.html')
+
+    def post(self):
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+
+        my_kw = {}
+
+        if subject is None:
+            my_kw['subject_err'] = 'Subject is a required field for blogs'
+        if content is None:
+            my_kw['content_err'] = 'Content is a required field for blogs'
+
+        if my_kw:
+            my_kw['subject'] = subject
+            my_kw['content'] = content
+            self.render('new_post.html', **my_kw)
+
+        else:
+            my_kw['subject'] = subject
+            my_kw['content'] = content
+            new_post = BlogPost(subject=subject, content=content)
+            print(str(new_post))
+            new_post.put()
+            new_post_id = new_post.key().id()
+            self.redirect(webapp2.uri_for('postpermalink', post_id=new_post_id))
+
+class PostPermalinkHandler(Handler):
+    def get(self, post_id):
+        # print(self.request.route_args)
+        the_post = BlogPost.get_by_id(int(post_id)) # Model.get_by_id (ids, parent=None)
+        self.render('post_permalink.html',
+                    id=post_id,
+                    subject=the_post.subject,
+                    content=the_post.content,
+                    postedAt=the_post.postedAt)
+
+
 # Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
-    ('/', MainPage),
-    ('/fizzbuzz', FizzBuzzHandler),
-    ('/rot13', Rot13Handler),
-    ('/welcome', WelcomeHandler),
-    ('/signup', SignUpHandler)
+    webapp2.Route(r'/', handler=MainPage, name='main'),
+    webapp2.Route(r'/fizzbuzz', handler=FizzBuzzHandler, name='fizz'),
+    webapp2.Route(r'/rot13', handler=Rot13Handler, name='rot13'),
+    webapp2.Route(r'/welcome', handler=WelcomeHandler, name='welcome'),
+    webapp2.Route(r'/signup', handler=SignUpHandler, name='signup'),
+    webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
+    webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),
+    webapp2.Route(r'/blog/post/<post_id>', handler=PostPermalinkHandler, name='postpermalink')
 ], debug=True)

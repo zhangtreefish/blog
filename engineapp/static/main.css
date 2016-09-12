@@ -1,0 +1,29 @@
+body {
+	font-family: sans-serif;
+	width: 800px;
+	margin: auto;
+	padding: 30px;
+}
+label {
+	display: block;
+	font-size: 2em;
+}
+input[type=text] {
+	display: block;
+	width: 400px;
+	font-size: 2em;
+	padding: 0.2em;
+}
+input[type=submit] {
+	font-size: 2.2em;
+}
+textarea {
+	display: block;
+	width: 400px;
+	height: 200px;
+	font-size: 1.8em;
+	font-family: monospace;
+}
+li {
+	margin: 30px;
+}

@@ -129,7 +129,7 @@ class BlogPost(db.Model):
 
 class BlogHandler(Handler):
     def get(self):
-        all_posts = BlogPost.all()  # Model.all (keys_only=False)
+        all_posts = BlogPost.all().order('-postedAt').run(limit=5)  # Model.all (keys_only=False)
         self.render('blog_front.html', posts=all_posts)
 
 class NewPostHandler(Handler):

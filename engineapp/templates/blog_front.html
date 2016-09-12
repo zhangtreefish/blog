@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if posts %}
+    <div> Posts List
+        <ol>
+            {% for post in posts %}
+                <li>
+                    <span>{{post.subject}}</span>
+                    <span> At {{post.postedAt}}</span>
+                    <textarea>Content {{post.content}}</textarea>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+{% endif %}
+{% endblock %}

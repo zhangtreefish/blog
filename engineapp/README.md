@@ -1,4 +1,4 @@
-# A simple app built with Google App Engine
+# A Simple Blog App Built with Google App Engine
 
 ## Explore my app at http://blog-16.appspot.com/
 
@@ -11,5 +11,5 @@
  field of app.yaml with the project ID obtained. To deploy run
  'appcfg.py update engineapp/'
 
- ## References
- 1. https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris
+## References
+1. https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris

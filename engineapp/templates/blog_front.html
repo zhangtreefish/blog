@@ -6,9 +6,9 @@
         <ol>
             {% for post in posts %}
                 <li>
-                    <span>{{post.subject}}</span>
-                    <span> At {{post.postedAt}}</span>
-                    <textarea>Content {{post.content}}</textarea>
+                    <strong>{{post.subject}}</strong>
+                    <span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+                    <textarea>{{post.content}}</textarea>
                 </li>
             {% endfor %}
         </ol>

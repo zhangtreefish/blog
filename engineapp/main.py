@@ -23,6 +23,25 @@ import re
 import datetime
 from google.appengine.ext import db
 
+import hmac
+from secret import SECRET
+
+def hash_str(s):
+    return hmac.new(SECRET,s).hexdigest()
+
+def make_secure_val(s):
+    return "{},{}".format(s, hash_str(s))
+
+def check_secure_val(h):
+    ###Your code here
+    pos = h.find(",")
+    if pos != -1:
+        s = h[:pos]
+        hsh = h[pos+1:]
+        return s if hash_str(s)==hsh else None
+    else:
+        return None
+
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 # jinja2.6 deos not support lstrip_blocks
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
@@ -54,6 +73,21 @@ class Handler(webapp2.RequestHandler):
 
 class MainPage(Handler):
     def get(self):
+        visits = 0
+        cookie_val = self.request.cookies.get("visits")
+        secure_cookie = check_secure_val(cookie_val)
+        if secure_cookie and secure_cookie.isdigit():
+            visits = int(secure_cookie)
+
+        visits += 1
+        new_cookie = make_secure_val("{}".format(visits))
+        self.response.set_cookie("visits", "{}".format(new_cookie))
+
+        if visits >1000:
+            self.write("You are a loyal visitor!")
+        else:
+            self.write("You have visited {} times".format(visits))
+
         foods = self.request.get_all("food")
         self.render('shopping_list.html', foods=foods)
 

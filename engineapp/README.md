@@ -1,6 +1,6 @@
 # A Simple Blog App Built with Google App Engine
 
-## Explore my app at http://blog-16.appspot.com/
+## Explore my app at http://blog-16.appspot.com/blog
 
 ## How to run this app from your machine
 

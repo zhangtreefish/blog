@@ -75,9 +75,10 @@ class MainPage(Handler):
     def get(self):
         visits = 0
         cookie_val = self.request.cookies.get("visits")
-        secure_cookie = check_secure_val(cookie_val)
-        if secure_cookie and secure_cookie.isdigit():
-            visits = int(secure_cookie)
+        if cookie_val:
+            secure_cookie = check_secure_val(cookie_val)
+            if secure_cookie and secure_cookie.isdigit():
+                visits = int(secure_cookie)
 
         visits += 1
         new_cookie = make_secure_val("{}".format(visits))

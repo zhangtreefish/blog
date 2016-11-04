@@ -138,6 +138,25 @@ class WelcomeHandler(Handler):
         else:
             self.redirect('/signup')
 
+class FormHandler(webapp2.RequestHandler):
+    def post(self):
+        q = self.request.get("q")
+        # self.response.write(q)
+        # useful for debug:
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write(self.request)
+
+# ---------Blog project--------------------------
+class BlogPost(db.Model):
+    subject = db.StringProperty(required=True)
+    content = db.TextProperty(required=True)
+    postedAt = db.DateTimeProperty(auto_now_add=True)
+
+class BlogHandler(Handler):
+    def get(self):
+        all_posts = BlogPost.all().order('-postedAt').run(limit=5)  # Model.all (keys_only=False)
+        self.render('blog_front.html', posts=all_posts)
+
 class SignUpHandler(Handler):
     def get(self):
         self.render('signup.html')
@@ -172,7 +191,11 @@ class SignUpHandler(Handler):
 
             if password_cookie is None:
                 new_cookie = make_pw_hash("password", password_input)
-                self.response.set_cookie("password", new_cookie, path='/')
+                self.response.set_cookie(
+                    "password",
+                    new_cookie,
+                    expires=(datetime.datetime.now() + datetime.timedelta(weeks=4)).strftime('%a, %d %b %Y %H:%M:%S GMT') ,
+                    path='/')
                 self.redirect('/welcome?username={}'.format(username_input))
             else:
                 is_cookie_secure = valid_pw("password", password_input, password_cookie)
@@ -181,26 +204,6 @@ class SignUpHandler(Handler):
                     self.render('signup.html')
                 else:
                     self.redirect('/welcome?username={}'.format(username_input))
-#         # set_cookie(key, value='', max_age=None, path='/', domain=None, secure=None, httponly=False, comment=None, expires=None, overwrite=False)# empty dict evaluates to False
-
-class FormHandler(webapp2.RequestHandler):
-    def post(self):
-        q = self.request.get("q")
-        # self.response.write(q)
-        # useful for debug:
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.out.write(self.request)
-
-# ---------Blog project--------------------------
-class BlogPost(db.Model):
-    subject = db.StringProperty(required=True)
-    content = db.TextProperty(required=True)
-    postedAt = db.DateTimeProperty(auto_now_add=True)
-
-class BlogHandler(Handler):
-    def get(self):
-        all_posts = BlogPost.all().order('-postedAt').run(limit=5)  # Model.all (keys_only=False)
-        self.render('blog_front.html', posts=all_posts)
 
 class NewPostHandler(Handler):
     def get(self):

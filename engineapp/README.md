@@ -7,8 +7,9 @@
 * Run git clone https://github.com/zhangtreefish/blog.git
 * Run inside the directory engineapp:`dev_appserver.py . `
   and go to localhost:8080/blog
-* Create a project at Google Cloud Platform, asign yourself a role in the project . To deploy run
- 'gcloud app deploy'
+* Create a project at Google Cloud Platform, asign yourself a role
+  in the project at IAM/Admin tab. To deploy run
+ `gcloud app deploy`
 
 ## References
 1. https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris

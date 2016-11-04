@@ -202,19 +202,18 @@ class SignUpHandler(Handler):
             self.render('signup.html', **my_kw)
 
         else:
-            password_cookie = self.request.cookies.get("password")
+            password_cookie = self.request.cookies.get(username_input)
 
             if password_cookie is None:
-                new_cookie = make_pw_hash("password", password_input)
+                new_cookie = make_pw_hash(username_input, password_input)
                 self.response.set_cookie(
-                    "password",
+                    username_input,
                     new_cookie,
-
                     path='/')
                 registerUser(username_input, password_input, email_input)
                 self.redirect('/welcome?username={}'.format(username_input))
             else:
-                is_cookie_secure = valid_pw("password", password_input, password_cookie)
+                is_cookie_secure = valid_pw(username_input, password_input, password_cookie)
                 if is_cookie_secure != True:
                     self.write('Entered password did not match record.')
                     self.render('signup.html')

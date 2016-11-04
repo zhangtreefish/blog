@@ -209,7 +209,7 @@ class SignUpHandler(Handler):
                 self.response.set_cookie(
                     "password",
                     new_cookie,
-                    expires=(datetime.datetime.now() + datetime.timedelta(weeks=4)).strftime('%a, %d %b %Y %H:%M:%S GMT') ,
+
                     path='/')
                 registerUser(username_input, password_input, email_input)
                 self.redirect('/welcome?username={}'.format(username_input))

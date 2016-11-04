@@ -26,6 +26,28 @@ from google.appengine.ext import db
 import hmac
 from secret import SECRET
 
+import random
+import string
+import hashlib
+
+
+# The following handle setting and verification for 'password' cookie
+def make_salt():
+    return ''.join(random.choice(string.letters) for x in xrange(5))
+
+def make_pw_hash(name, pw, salt=None):
+    if salt == None:
+        salt = make_salt()
+    h = hashlib.sha256(name + pw + salt).hexdigest()
+    return '%s,%s' % (h, salt)
+
+def valid_pw(name, pw, h):
+    li = h.split(',')
+    sal = li[-1]
+    hash = li[0]
+    return True if hash==make_pw_hash(name, pw, sal).split(',')[0] else False
+
+# The following handle setting and verification for 'visits' cookie
 def hash_str(s):
     return hmac.new(SECRET,s).hexdigest()
 
@@ -33,7 +55,6 @@ def make_secure_val(s):
     return "{},{}".format(s, hash_str(s))
 
 def check_secure_val(h):
-    ###Your code here
     pos = h.find(",")
     if pos != -1:
         s = h[:pos]
@@ -42,12 +63,6 @@ def check_secure_val(h):
     else:
         return None
 
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-# jinja2.6 deos not support lstrip_blocks
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
-                               trim_blocks=True,
-                               # lstrip_blocks=True,
-                               autoescape=True)
 
 USER_RE = re.compile(r"^[\w-]{3,20}$") #\w same as a-zA-Z0-9_
 PASSWORD_RE = re.compile(r"^.{3,20}$")
@@ -60,6 +75,13 @@ def valid_password(password):
 def valid_email(email):
     return EMAIL_RE.match(email)
 
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+# jinja2.6 deos not support lstrip_blocks
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
+                               trim_blocks=True,
+                               # lstrip_blocks=True,
+                               autoescape=True)
+
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -70,6 +92,7 @@ class Handler(webapp2.RequestHandler):
 
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
+
 
 class MainPage(Handler):
     def get(self):
@@ -139,14 +162,26 @@ class SignUpHandler(Handler):
         if email_input and valid_email(email_input) is None:
             my_kw['email_err'] = "That's not a valid email."
 
-        # empty dict evaluates to False
         if my_kw:
             my_kw['username'] = username_input
             my_kw['email'] = email_input
             self.render('signup.html', **my_kw)
 
         else:
-            self.redirect('/welcome?username={}'.format(username_input))
+            password_cookie = self.request.cookies.get("password")
+
+            if password_cookie is None:
+                new_cookie = make_pw_hash("password", password_input)
+                self.response.set_cookie("password", new_cookie, path='/')
+                self.redirect('/welcome?username={}'.format(username_input))
+            else:
+                is_cookie_secure = valid_pw("password", password_input, password_cookie)
+                if is_cookie_secure != True:
+                    self.write('Entered password did not match record.')
+                    self.render('signup.html')
+                else:
+                    self.redirect('/welcome?username={}'.format(username_input))
+#         # set_cookie(key, value='', max_age=None, path='/', domain=None, secure=None, httponly=False, comment=None, expires=None, overwrite=False)# empty dict evaluates to False
 
 class FormHandler(webapp2.RequestHandler):
     def post(self):

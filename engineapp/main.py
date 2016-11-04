@@ -152,10 +152,25 @@ class BlogPost(db.Model):
     content = db.TextProperty(required=True)
     postedAt = db.DateTimeProperty(auto_now_add=True)
 
+class User(db.Model):
+    username = db.StringProperty(required=True)
+    password = db.StringProperty(required=True)
+    email = db.StringProperty(required=True)
+    lastLoggedIn = db.DateTimeProperty(auto_now_add=True)
+
+def registerUser(name, password, email):
+    user = User(username=name, password=password, email=email)
+    user.put()
+
 class BlogHandler(Handler):
     def get(self):
         all_posts = BlogPost.all().order('-postedAt').run(limit=5)  # Model.all (keys_only=False)
         self.render('blog_front.html', posts=all_posts)
+
+class UsersHandler(Handler):
+    def get(self):
+        all_users = User.all().order('-lastLoggedIn').run(limit=5)
+        self.render('users.html', users=all_users)
 
 class SignUpHandler(Handler):
     def get(self):
@@ -196,6 +211,7 @@ class SignUpHandler(Handler):
                     new_cookie,
                     expires=(datetime.datetime.now() + datetime.timedelta(weeks=4)).strftime('%a, %d %b %Y %H:%M:%S GMT') ,
                     path='/')
+                registerUser(username_input, password_input, email_input)
                 self.redirect('/welcome?username={}'.format(username_input))
             else:
                 is_cookie_secure = valid_pw("password", password_input, password_cookie)
@@ -203,6 +219,7 @@ class SignUpHandler(Handler):
                     self.write('Entered password did not match record.')
                     self.render('signup.html')
                 else:
+                    registerUser(username_input, password_input, email_input)
                     self.redirect('/welcome?username={}'.format(username_input))
 
 class NewPostHandler(Handler):
@@ -254,5 +271,6 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/blog/signup', handler=SignUpHandler, name='signup'),
     webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
     webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),
-    webapp2.Route(r'/blog/post/<post_id>', handler=PostPermalinkHandler, name='postpermalink')
+    webapp2.Route(r'/blog/post/<post_id>', handler=PostPermalinkHandler, name='postpermalink'),
+    webapp2.Route(r'/blog/users', handler=UsersHandler, name='users')
 ], debug=True)

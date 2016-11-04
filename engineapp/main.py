@@ -213,7 +213,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/fizzbuzz', handler=FizzBuzzHandler, name='fizz'),
     webapp2.Route(r'/rot13', handler=Rot13Handler, name='rot13'),
     webapp2.Route(r'/welcome', handler=WelcomeHandler, name='welcome'),
-    webapp2.Route(r'/signup', handler=SignUpHandler, name='signup'),
+    webapp2.Route(r'/blog/signup', handler=SignUpHandler, name='signup'),
     webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
     webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),
     webapp2.Route(r'/blog/post/<post_id>', handler=PostPermalinkHandler, name='postpermalink')

@@ -155,10 +155,10 @@ class BlogPost(db.Model):
 class User(db.Model):
     username = db.StringProperty(required=True)
     password_hash = db.StringProperty(required=True)
-    email = db.StringProperty(required=True)
+    email = db.StringProperty()
     lastLoggedIn = db.DateTimeProperty(auto_now_add=True)
 
-def registerUser(name, password, email):
+def registerUser(name, password, email=None):
     password_hash = make_pw_hash(name, password) or 'pwd hash'
     user = User(username=name, password_hash=password_hash, email=email)
     user.put()
@@ -210,7 +210,7 @@ class SignUpHandler(Handler):
                     username_input,
                     new_cookie,
                     path='/')
-                registerUser(username_input, password_input, email_input)
+                registerUser(username_input, password_input, email_input or None)
                 self.redirect('/blog/welcome?username={}'.format(username_input))
             else:
                 is_cookie_secure = valid_pw(username_input, password_input, password_cookie)
@@ -218,7 +218,7 @@ class SignUpHandler(Handler):
                     self.write('Entered password did not match record.')
                     self.render('signup.html')
                 else:
-                    registerUser(username_input, password_input, email_input)
+                    registerUser(username_input, password_input, email_input or None)
                     self.redirect('/blog/welcome?username={}'.format(username_input))
 
 class NewPostHandler(Handler):

@@ -154,12 +154,13 @@ class BlogPost(db.Model):
 
 class User(db.Model):
     username = db.StringProperty(required=True)
-    password = db.StringProperty(required=True)
+    password_hash = db.StringProperty(required=True)
     email = db.StringProperty(required=True)
     lastLoggedIn = db.DateTimeProperty(auto_now_add=True)
 
 def registerUser(name, password, email):
-    user = User(username=name, password=password, email=email)
+    password_hash = make_pw_hash(name, password) or 'pwd hash'
+    user = User(username=name, password_hash=password_hash, email=email)
     user.put()
 
 class BlogHandler(Handler):
@@ -203,9 +204,8 @@ class SignUpHandler(Handler):
 
         else:
             password_cookie = self.request.cookies.get(username_input)
-
+            new_cookie = make_pw_hash(username_input, password_input)
             if password_cookie is None:
-                new_cookie = make_pw_hash(username_input, password_input)
                 self.response.set_cookie(
                     username_input,
                     new_cookie,

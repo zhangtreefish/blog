@@ -211,7 +211,7 @@ class SignUpHandler(Handler):
                     new_cookie,
                     path='/')
                 registerUser(username_input, password_input, email_input)
-                self.redirect('/welcome?username={}'.format(username_input))
+                self.redirect('/blog/welcome?username={}'.format(username_input))
             else:
                 is_cookie_secure = valid_pw(username_input, password_input, password_cookie)
                 if is_cookie_secure != True:
@@ -219,7 +219,7 @@ class SignUpHandler(Handler):
                     self.render('signup.html')
                 else:
                     registerUser(username_input, password_input, email_input)
-                    self.redirect('/welcome?username={}'.format(username_input))
+                    self.redirect('/blog/welcome?username={}'.format(username_input))
 
 class NewPostHandler(Handler):
     def get(self):
@@ -266,7 +266,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/', handler=MainPage, name='main'),
     webapp2.Route(r'/fizzbuzz', handler=FizzBuzzHandler, name='fizz'),
     webapp2.Route(r'/rot13', handler=Rot13Handler, name='rot13'),
-    webapp2.Route(r'/welcome', handler=WelcomeHandler, name='welcome'),
+    webapp2.Route(r'/blog/welcome', handler=WelcomeHandler, name='welcome'),
     webapp2.Route(r'/blog/signup', handler=SignUpHandler, name='signup'),
     webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
     webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),

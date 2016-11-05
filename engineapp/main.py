@@ -44,8 +44,7 @@ def make_pw_hash(name, pw, salt=None):
 def valid_pw(name, pw, h):
     li = h.split(',')
     sal = li[-1]
-    hash = li[0]
-    return True if hash==make_pw_hash(name, pw, sal).split(',')[0] else False
+    return True if h==make_pw_hash(name, pw, sal) else False
 
 # The following handle setting and verification for 'visits' cookie
 def hash_str(s):
@@ -158,6 +157,13 @@ class User(db.Model):
     email = db.StringProperty()
     lastLoggedIn = db.DateTimeProperty(auto_now_add=True)
 
+def registered_username(name):
+    return name if db.Query(User).filter('username=', name).get() != None else None
+
+    # @classMethod
+    # def matching_password(name, password):
+    #     password_hash = make_pw_hash(name, password)
+
 def registerUser(name, password, email=None):
     password_hash = make_pw_hash(name, password) or 'pwd hash'
     user = User(username=name, password_hash=password_hash, email=email)
@@ -221,6 +227,62 @@ class SignUpHandler(Handler):
                     registerUser(username_input, password_input, email_input or None)
                     self.redirect('/blog/welcome?username={}'.format(username_input))
 
+class LogInHandler(Handler):
+    def get(self):
+        self.render('login.html')
+
+    def post(self):
+        username_input = self.request.get('username')
+        password_input = self.request.get('password')
+
+        my_kw = {}
+
+        if username_input is None or valid_username(username_input) is None:
+            my_kw['username_err'] = "Please enter a registered username."
+
+        if password_input is None or valid_password(password_input) is None:
+            my_kw['password_err'] = "That's not a valid password."
+
+
+        if my_kw:
+            my_kw['username'] = username_input
+            self.render('login.html', **my_kw)
+
+        else:
+            password_cookie = self.request.cookies.get(username_input)
+            new_cookie = make_pw_hash(username_input, password_input)
+            if password_cookie is None:
+                self.response.set_cookie(
+                    username_input,
+                    new_cookie,
+                    path='/')
+                self.redirect('/blog/welcome?username={}'.format(username_input))
+            else:
+                is_cookie_secure = valid_pw(username_input, password_input, password_cookie)
+                if is_cookie_secure != True:
+                    self.write('Entered password did not match record.')
+                    self.render('login.html')
+                else:
+                    self.redirect('/blog/welcome?username={}'.format(username_input))
+                    COOKIE_RE = re.compile(r'.+=;\s*Path=/')
+                    password_cookie = self.request.cookies.get(username)
+                    if COOKIE_RE.match(password_cookie):
+                        self.redirect('/blog/signup')
+
+class LogOutHandler(Handler):
+    def get(self):
+        username = self.request.get("username")
+        password_cookie = self.request.cookies.get(username)
+        if password_cookie is None:
+                self.write('Already logged out')
+        else:
+            # self.response.set_cookie(
+            #         '',
+            #         ' ',
+            #         Path='/')
+            self.response.headers.add_header('Set-Cookie', '{}=; Path=/'.format(username))  # r'.+=;\s*Path=/'
+            self.redirect('/blog/signup')
+
 class NewPostHandler(Handler):
     def get(self):
         self.render('new_post.html')
@@ -268,6 +330,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/rot13', handler=Rot13Handler, name='rot13'),
     webapp2.Route(r'/blog/welcome', handler=WelcomeHandler, name='welcome'),
     webapp2.Route(r'/blog/signup', handler=SignUpHandler, name='signup'),
+    webapp2.Route(r'/blog/login', handler=LogInHandler, name='login'),
+    webapp2.Route(r'/blog/logout', handler=LogOutHandler, name='logout'),
     webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
     webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),
     webapp2.Route(r'/blog/post/<post_id>', handler=PostPermalinkHandler, name='postpermalink'),

@@ -30,7 +30,6 @@ import random
 import string
 import hashlib
 
-
 # The following handle setting and verification for 'password' cookie
 def make_salt():
     return ''.join(random.choice(string.letters) for x in xrange(5))
@@ -66,6 +65,7 @@ def check_secure_val(h):
 USER_RE = re.compile(r"^[\w-]{3,20}$") #\w same as a-zA-Z0-9_
 PASSWORD_RE = re.compile(r"^.{3,20}$")
 EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
+COOKIE_RE = re.compile(r'.+=;\s*Path=/')
 
 def valid_username(username):
     return USER_RE.match(username)
@@ -132,10 +132,13 @@ class Rot13Handler(Handler):
 class WelcomeHandler(Handler):
     def get(self):
         username = self.request.get("username")
-        if username:
-            self.render('welcome.html', username=username)
+        password_cookie = self.request.cookies.get(username)
+        all_posts = BlogPost.all().order('-postedAt').run(limit=5)
+        # if username and password_cookie and COOKIE_RE.match(password_cookie):
+        if username and password_cookie:
+            self.render('welcome.html', username=username, posts=all_posts)
         else:
-            self.redirect('/signup')
+            self.redirect('/blog/signup')
 
 class FormHandler(webapp2.RequestHandler):
     def post(self):
@@ -168,6 +171,7 @@ def registerUser(name, password, email=None):
     password_hash = make_pw_hash(name, password) or 'pwd hash'
     user = User(username=name, password_hash=password_hash, email=email)
     user.put()
+    return user
 
 class BlogHandler(Handler):
     def get(self):
@@ -192,10 +196,11 @@ class SignUpHandler(Handler):
         my_kw = {}
 
         if username_input is None or valid_username(username_input) is None:
-            my_kw['username_err'] = "That's not a valid username."
+            my_kw['username_err'] = "Username invalid, use only a-zA-Z0-9"
+
 
         if password_input is None or valid_password(password_input) is None:
-            my_kw['password_err'] = "That's not a valid password."
+            my_kw['password_err'] = "Password invalid, its length has to be 3-20 ."
 
         if verify_input is None or password_input != verify_input:
             my_kw['verify_err'] = "Your passwords didn't match."
@@ -264,10 +269,6 @@ class LogInHandler(Handler):
                     self.render('login.html')
                 else:
                     self.redirect('/blog/welcome?username={}'.format(username_input))
-                    COOKIE_RE = re.compile(r'.+=;\s*Path=/')
-                    password_cookie = self.request.cookies.get(username)
-                    if COOKIE_RE.match(password_cookie):
-                        self.redirect('/blog/signup')
 
 class LogOutHandler(Handler):
     def get(self):
@@ -279,8 +280,8 @@ class LogOutHandler(Handler):
             # self.response.set_cookie(
             #         '',
             #         ' ',
-            #         Path='/')
-            self.response.headers.add_header('Set-Cookie', '{}=; Path=/'.format(username))  # r'.+=;\s*Path=/'
+            #         Path='/') self.response.headers.add_header('Set-Cookie', 'user_id=; Path=/')
+            self.response.headers.add_header('Set-Cookie', 'sth=; Path=/')  # r'.+=;\s*Path=/'
             self.redirect('/blog/signup')
 
 class NewPostHandler(Handler):

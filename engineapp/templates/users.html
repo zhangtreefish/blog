@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if users %}
+    <div> Users List
+        <ol>
+            {% for user in users %}
+                <li>
+                    <strong>{{user.username}}</strong>
+                    <span> last on {{user.lastLoggedIn.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+{% endif %}
+{% endblock %}

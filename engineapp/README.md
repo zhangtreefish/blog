@@ -1,22 +1,22 @@
 # A Simple Blog App Built with Google App Engine
 ### Explore my app at [here](http://gaejinjablog.appspot.com/blog)
 ## Features:
---Front page that lists blog posts: /welcome
---A form to submit new entries: /newpost
---Blog posts have their own page: /post/<post_id>.
+--Front page that lists blog posts: /welcome__
+--A form to submit new entries: /newpost__
+--Blog posts have their own page: /post/<post_id>.__
 
 --A signup form that validates inputs and displays error(s):
-  /signup; upon success the user is directed to the welcome page;
+  /signup; upon success the user is directed to the welcome page;__
 -- If a user visits without being signed in (i.e. having a cookie),
-   then redirected to the signup page
--- Passwords stored securely as salted hash
+   then redirected to the signup page__
+-- Passwords stored securely as salted hash__
 
 -- A login form that validates inputs and displays error(s):
-   /login; on success directed to the same welcome page
+   /login; on success directed to the same welcome page__
 
 -- A logout form that validates inputs and displays error(s):
    /logout; on success the cookie is cleared and user is redirected
-    to the signup page.
+    to the signup page.__
 
 ## How to run this app from your machine
 
@@ -28,6 +28,6 @@
  `gcloud app deploy`
 
 ## References
-[1. webapp2 Building URIs](https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris)
-[2. Deploying a Python App](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp)
+[1. webapp2 Building URIs](https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris)__
+[2. Deploying a Python App](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp)__
 [3. quickstart](https://cloud.google.com/appengine/docs/python/quickstart)

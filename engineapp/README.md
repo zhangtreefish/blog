@@ -1,6 +1,6 @@
 # A Simple Blog App Built with Google App Engine
 ### Explore my app at [here](http://gaejinjablog.appspot.com/blog)
-termed {baseUrl} from here on.
+{baseUrl} = http://gaejinjablog.appspot.com/blog from here on.
 ## Features:
 --Front page that lists blog posts: {baseUrl}/welcome<br />
 --A form to submit new entries: {baseUrl}/newpost<br />
@@ -10,7 +10,7 @@ termed {baseUrl} from here on.
   {baseUrl}/signup; upon success the user is directed to the
   welcome page;<br />
 -- If a user visits without being signed in (i.e. having a cookie),
-   then redirected to the signup page<br />
+   the user is redirected to the signup page<br />
 -- Passwords stored securely as salted hash<br />
 
 -- A login form that validates inputs and displays error(s):
@@ -30,6 +30,6 @@ termed {baseUrl} from here on.
  `gcloud app deploy`
 
 ## References
-1__ webapp2 Building URIs: https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris
-2__ Deploying a Python App: https://cloud.google.com/appengine/docs/python/tools/uploadinganapp
-3__ quickstart: https://cloud.google.com/appengine/docs/python/quickstart
+1 webapp2 Building URIs: https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris<br />
+2 Deploying a Python App: https://cloud.google.com/appengine/docs/python/tools/uploadinganapp<br />
+3 quickstart: https://cloud.google.com/appengine/docs/python/quickstart

@@ -19,13 +19,10 @@ import webapp2
 import jinja2
 import codecs
 import re
-
 import datetime
 from google.appengine.ext import db
-
 import hmac
 from secret import SECRET
-
 import random
 import string
 import hashlib
@@ -49,29 +46,9 @@ def valid_pw(name, pw, h):
     return True if h == make_pw_hash(name, pw, sal) else False
 
 
-# The following handle setting and verification for 'visits' cookie
-def hash_str(s):
-    return hmac.new(SECRET, s).hexdigest()
-
-
-def make_secure_val(s):
-    return "{},{}".format(s, hash_str(s))
-
-
-def check_secure_val(h):
-    pos = h.find(",")
-    if pos != -1:
-        s = h[:pos]
-        hsh = h[pos+1:]
-        return s if hash_str(s) == hsh else None
-    else:
-        return None
-
-
 USER_RE = re.compile(r"^[\w-]{3,20}$")  # \w same as a-zA-Z0-9_
 PASSWORD_RE = re.compile(r"^.{3,20}$")
 EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
-COOKIE_RE = re.compile(r'.+=;\s*Path=/')
 
 
 def valid_username(username):
@@ -105,67 +82,17 @@ class Handler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
 
-class MainPage(Handler):
-    def get(self):
-        visits = 0
-        cookie_val = self.request.cookies.get("visits")
-        if cookie_val:
-            secure_cookie = check_secure_val(cookie_val)
-            if secure_cookie and secure_cookie.isdigit():
-                visits = int(secure_cookie)
-
-        visits += 1
-        new_cookie = make_secure_val("{}".format(visits))
-        self.response.set_cookie("visits", "{}".format(new_cookie))
-
-        if visits > 1000:
-            self.write("You are a loyal visitor!")
-        else:
-            self.write("You have visited {} times".format(visits))
-
-        foods = self.request.get_all("food")
-        self.render('shopping_list.html', foods=foods)
-
-
-class FizzBuzzHandler(Handler):
-    def get(self):
-        n = self.request.get("n")
-        n = n and int(n)
-        self.render('fizzbuzz.html', n=n)
-
-
-class Rot13Handler(Handler):
-    def get(self):
-        self.render('rot13.html')
-
-    def post(self):
-        msg = self.request.get('text')
-        rotted_msg = codecs.encode(msg, 'rot13')
-        self.render('rot13.html', text=rotted_msg)
-
-
 class WelcomeHandler(Handler):
     def get(self):
         username = self.request.get("username")
         password_cookie = self.request.cookies.get(username)
         all_posts = BlogPost.all().order('-postedAt').run(limit=5)
-        # if username and password_cookie and COOKIE_RE.match(password_cookie):
         if username and password_cookie:
             self.render('welcome.html', username=username, posts=all_posts)
         else:
             self.redirect('/blog/signup')
 
 
-class FormHandler(webapp2.RequestHandler):
-    def post(self):
-        q = self.request.get("q")
-        # self.response.write(q)
-        # useful for debug:
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.out.write(self.request)
-
-
-# ---------Blog project--------------------------
 class BlogPost(db.Model):
     subject = db.StringProperty(required=True)
     content = db.TextProperty(required=True)
@@ -180,8 +107,7 @@ class User(db.Model):
 
 
 def registered_username(name):
-    return name if db.Query(User).filter('username=', name).get() is not None
-    else None
+    return name if db.Query(User).filter('username=', name).get() is not None else None
 
     # @classMethod
     # def matching_password(name, password):
@@ -380,14 +306,11 @@ class PostPermalinkHandler(Handler):
 
 # Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
-    webapp2.Route(r'/', handler=MainPage, name='main'),
-    webapp2.Route(r'/fizzbuzz', handler=FizzBuzzHandler, name='fizz'),
-    webapp2.Route(r'/rot13', handler=Rot13Handler, name='rot13'),
+    webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
     webapp2.Route(r'/blog/welcome', handler=WelcomeHandler, name='welcome'),
     webapp2.Route(r'/blog/signup', handler=SignUpHandler, name='signup'),
     webapp2.Route(r'/blog/login', handler=LogInHandler, name='login'),
     webapp2.Route(r'/blog/logout', handler=LogOutHandler, name='logout'),
-    webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
     webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),
     webapp2.Route(r'/blog/post/<post_id>',
                   handler=PostPermalinkHandler, name='postpermalink'),

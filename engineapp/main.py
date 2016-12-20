@@ -30,47 +30,58 @@ import random
 import string
 import hashlib
 
+
 # The following handle setting and verification for 'password' cookie
 def make_salt():
     return ''.join(random.choice(string.letters) for x in xrange(5))
 
+
 def make_pw_hash(name, pw, salt=None):
-    if salt == None:
+    if salt is None:
         salt = make_salt()
     h = hashlib.sha256(name + pw + salt).hexdigest()
     return '%s,%s' % (h, salt)
 
+
 def valid_pw(name, pw, h):
     li = h.split(',')
     sal = li[-1]
-    return True if h==make_pw_hash(name, pw, sal) else False
+    return True if h == make_pw_hash(name, pw, sal) else False
+
 
 # The following handle setting and verification for 'visits' cookie
 def hash_str(s):
-    return hmac.new(SECRET,s).hexdigest()
+    return hmac.new(SECRET, s).hexdigest()
+
 
 def make_secure_val(s):
     return "{},{}".format(s, hash_str(s))
+
 
 def check_secure_val(h):
     pos = h.find(",")
     if pos != -1:
         s = h[:pos]
         hsh = h[pos+1:]
-        return s if hash_str(s)==hsh else None
+        return s if hash_str(s) == hsh else None
     else:
         return None
 
 
-USER_RE = re.compile(r"^[\w-]{3,20}$") #\w same as a-zA-Z0-9_
+USER_RE = re.compile(r"^[\w-]{3,20}$")  # \w same as a-zA-Z0-9_
 PASSWORD_RE = re.compile(r"^.{3,20}$")
 EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
 COOKIE_RE = re.compile(r'.+=;\s*Path=/')
 
+
 def valid_username(username):
     return USER_RE.match(username)
+
+
 def valid_password(password):
     return PASSWORD_RE.match(password)
+
+
 def valid_email(email):
     return EMAIL_RE.match(email)
 
@@ -81,13 +92,14 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                # lstrip_blocks=True,
                                autoescape=True)
 
+
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
 
     def render_str(self, template, **params):
-        t = jinja_env.get_template(template) #load template from environment
-        return t.render(**params) # render template with params
+        t = jinja_env.get_template(template)  # load template from environment
+        return t.render(**params)  # render template with params
 
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
@@ -106,7 +118,7 @@ class MainPage(Handler):
         new_cookie = make_secure_val("{}".format(visits))
         self.response.set_cookie("visits", "{}".format(new_cookie))
 
-        if visits >1000:
+        if visits > 1000:
             self.write("You are a loyal visitor!")
         else:
             self.write("You have visited {} times".format(visits))
@@ -114,11 +126,13 @@ class MainPage(Handler):
         foods = self.request.get_all("food")
         self.render('shopping_list.html', foods=foods)
 
+
 class FizzBuzzHandler(Handler):
     def get(self):
         n = self.request.get("n")
         n = n and int(n)
         self.render('fizzbuzz.html', n=n)
+
 
 class Rot13Handler(Handler):
     def get(self):
@@ -128,6 +142,7 @@ class Rot13Handler(Handler):
         msg = self.request.get('text')
         rotted_msg = codecs.encode(msg, 'rot13')
         self.render('rot13.html', text=rotted_msg)
+
 
 class WelcomeHandler(Handler):
     def get(self):
@@ -140,6 +155,7 @@ class WelcomeHandler(Handler):
         else:
             self.redirect('/blog/signup')
 
+
 class FormHandler(webapp2.RequestHandler):
     def post(self):
         q = self.request.get("q")
@@ -148,11 +164,13 @@ class FormHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write(self.request)
 
+
 # ---------Blog project--------------------------
 class BlogPost(db.Model):
     subject = db.StringProperty(required=True)
     content = db.TextProperty(required=True)
     postedAt = db.DateTimeProperty(auto_now_add=True)
+
 
 class User(db.Model):
     username = db.StringProperty(required=True)
@@ -160,12 +178,15 @@ class User(db.Model):
     email = db.StringProperty()
     lastLoggedIn = db.DateTimeProperty(auto_now_add=True)
 
+
 def registered_username(name):
-    return name if db.Query(User).filter('username=', name).get() != None else None
+    return name if db.Query(User).filter('username=', name).get() is not None
+    else None
 
     # @classMethod
     # def matching_password(name, password):
     #     password_hash = make_pw_hash(name, password)
+
 
 def registerUser(name, password, email=None):
     password_hash = make_pw_hash(name, password) or 'pwd hash'
@@ -173,15 +194,19 @@ def registerUser(name, password, email=None):
     user.put()
     return user
 
+
 class BlogHandler(Handler):
     def get(self):
-        all_posts = BlogPost.all().order('-postedAt').run(limit=5)  # Model.all (keys_only=False)
+        # Model.all (keys_only=False)
+        all_posts = BlogPost.all().order('-postedAt').run(limit=5)
         self.render('blog_front.html', posts=all_posts)
+
 
 class UsersHandler(Handler):
     def get(self):
         all_users = User.all().order('-lastLoggedIn').run(limit=5)
         self.render('users.html', users=all_users)
+
 
 class SignUpHandler(Handler):
     def get(self):
@@ -198,9 +223,9 @@ class SignUpHandler(Handler):
         if username_input is None or valid_username(username_input) is None:
             my_kw['username_err'] = "Username invalid, use only a-zA-Z0-9"
 
-
         if password_input is None or valid_password(password_input) is None:
-            my_kw['password_err'] = "Password invalid, its length has to be 3-20 ."
+            my_kw['password_err'] = '''Password invalid, its length has to
+            be 3-20 .'''
 
         if verify_input is None or password_input != verify_input:
             my_kw['verify_err'] = "Your passwords didn't match."
@@ -221,16 +246,32 @@ class SignUpHandler(Handler):
                     username_input,
                     new_cookie,
                     path='/')
-                registerUser(username_input, password_input, email_input or None)
-                self.redirect('/blog/welcome?username={}'.format(username_input))
+                registerUser(
+                    username_input,
+                    password_input,
+                    email_input or None
+                )
+                self.redirect(
+                    '/blog/welcome?username={}'.format(username_input))
             else:
-                is_cookie_secure = valid_pw(username_input, password_input, password_cookie)
-                if is_cookie_secure != True:
+                is_cookie_secure = valid_pw(
+                    username_input,
+                    password_input,
+                    password_cookie
+                )
+                if is_cookie_secure is not True:
                     self.write('Entered password did not match record.')
                     self.render('signup.html')
                 else:
-                    registerUser(username_input, password_input, email_input or None)
-                    self.redirect('/blog/welcome?username={}'.format(username_input))
+                    registerUser(
+                        username_input,
+                        password_input,
+                        email_input or None
+                        )
+                    self.redirect(
+                        '/blog/welcome?username={}'.format(username_input)
+                    )
+
 
 class LogInHandler(Handler):
     def get(self):
@@ -248,7 +289,6 @@ class LogInHandler(Handler):
         if password_input is None or valid_password(password_input) is None:
             my_kw['password_err'] = "That's not a valid password."
 
-
         if my_kw:
             my_kw['username'] = username_input
             self.render('login.html', **my_kw)
@@ -261,14 +301,20 @@ class LogInHandler(Handler):
                     username_input,
                     new_cookie,
                     path='/')
-                self.redirect('/blog/welcome?username={}'.format(username_input))
+                self.redirect(
+                    '/blog/welcome?username={}'.format(username_input)
+                )
             else:
-                is_cookie_secure = valid_pw(username_input, password_input, password_cookie)
-                if is_cookie_secure != True:
+                is_cookie_secure = valid_pw(
+                    username_input, password_input, password_cookie)
+                if is_cookie_secure is not True:
                     self.write('Entered password did not match record.')
                     self.render('login.html')
                 else:
-                    self.redirect('/blog/welcome?username={}'.format(username_input))
+                    self.redirect(
+                        '/blog/welcome?username={}'.format(username_input)
+                    )
+
 
 class LogOutHandler(Handler):
     def get(self):
@@ -280,9 +326,13 @@ class LogOutHandler(Handler):
             # self.response.set_cookie(
             #         '',
             #         ' ',
-            #         Path='/') self.response.headers.add_header('Set-Cookie', 'user_id=; Path=/')
-            self.response.headers.add_header('Set-Cookie', 'sth=; Path=/')  # r'.+=;\s*Path=/'
+            #         Path='/')
+            # self.response.headers.add_header(
+            # 'Set-Cookie', 'user_id=; Path=/')
+            # r'.+=;\s*Path=/'
+            self.response.headers.add_header('Set-Cookie', 'sth=; Path=/')
             self.redirect('/blog/signup')
+
 
 class NewPostHandler(Handler):
     def get(self):
@@ -311,12 +361,16 @@ class NewPostHandler(Handler):
             print(str(new_post))
             new_post.put()
             new_post_id = new_post.key().id()
-            self.redirect(webapp2.uri_for('postpermalink', post_id=new_post_id))
+            self.redirect(
+                webapp2.uri_for('postpermalink', post_id=new_post_id)
+            )
+
 
 class PostPermalinkHandler(Handler):
     def get(self, post_id):
         # print(self.request.route_args)
-        the_post = BlogPost.get_by_id(int(post_id)) # Model.get_by_id (ids, parent=None)
+        # Model.get_by_id (ids, parent=None)
+        the_post = BlogPost.get_by_id(int(post_id))
         self.render('post_permalink.html',
                     id=post_id,
                     subject=the_post.subject,
@@ -335,6 +389,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/blog/logout', handler=LogOutHandler, name='logout'),
     webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
     webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),
-    webapp2.Route(r'/blog/post/<post_id>', handler=PostPermalinkHandler, name='postpermalink'),
+    webapp2.Route(r'/blog/post/<post_id>',
+                  handler=PostPermalinkHandler, name='postpermalink'),
     webapp2.Route(r'/blog/users', handler=UsersHandler, name='users')
 ], debug=True)

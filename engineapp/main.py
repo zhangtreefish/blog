@@ -26,6 +26,7 @@ from secret import SECRET
 import random
 import string
 import hashlib
+from google.appengine.api import users
 
 
 # The following handle setting and verification for 'password' cookie
@@ -220,7 +221,7 @@ class LogInHandler(Handler):
             self.render('login.html', **my_kw)
 
         else:
-            password_cookie = self.request.cookies.get(username_input)
+            password_cookie = self.request.cookies.get('username')
             new_cookie = make_pw_hash(username_input, password_input)
             if password_cookie is None:
                 self.response.set_cookie(
@@ -244,11 +245,16 @@ class LogInHandler(Handler):
 
 class LogOutHandler(Handler):
     def get(self):
-        username = self.request.get("username")
+
+        # user = users.get_current_user()
+        username = self.request.get('username')
+
+
         password_cookie = self.request.cookies.get(username)
         if password_cookie is None:
-                self.write('Already logged out')
+                self.write('User {} is currently logged out'.format(username))
         else:
+            self.response.delete_cookie(username)
             # self.response.set_cookie(
             #         '',
             #         ' ',
@@ -256,7 +262,7 @@ class LogOutHandler(Handler):
             # self.response.headers.add_header(
             # 'Set-Cookie', 'user_id=; Path=/')
             # r'.+=;\s*Path=/'
-            self.response.headers.add_header('Set-Cookie', 'sth=; Path=/')
+            # self.response.headers.add_header('Set-Cookie', 'username=; Path=/')
             self.redirect('/blog/signup')
 
 

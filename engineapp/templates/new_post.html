@@ -1,22 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-<form method="POST">
-	<label>Subject
-		<input type="text" name="subject" value="{{subject}}">
-	</label>
-	<span style="color: red">{{subject_err}}</span>
-	<br>
-	<label>Content
-		<textarea type="text" name="content" value="{{content}}"></textarea>
-	</label>
-	<span style="color: red">{{content_err}}</span>
-	<br>
-	<input type="submit">
-</form>
+<main>
+	<form method="POST">
+		<label>Subject
+			<input type="text" name="subject" value="{{subject}}">
+		</label>
+		<span style="color: red">{{subject_err}}</span>
+		<br>
+		<label>Content
+			<textarea type="text" name="content" value="{{content}}"></textarea>
+		</label>
+		<span style="color: red">{{content_err}}</span>
+		<br>
+		<input type="submit">
+	</form>
+</main>
 <footer>
-	<h2> If you are done for now, click the Log Out button below </h2>
-	<button type='button'><a href={{"/blog/logout"}}> Log Out </a></button>
-	<h2> You have to be logged in to post. Click the Log In button below </h2>
-	<button type='button'><a href={{"/blog/login"}}> Log In </a></button>
+	<div class="logout_hint">
+		<h2> If you are done for now, click the Log Out button below </h2>
+		<button type='button' class="logout_hint"><a href={{"/blog/logout"}}> Log Out </a></button>
+	</div>
+	<div class="login_hint">
+		<h2> You have to be logged in to post. Click the Log In button below </h2>
+		<button type='button' class="login_hint"><a href={{"/blog/login"}}> Log In </a></button>
+	</div>
 </footer>
 {% endblock %}

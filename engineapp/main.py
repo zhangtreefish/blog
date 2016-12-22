@@ -245,10 +245,17 @@ class LogInHandler(Handler):
 
 class LogOutHandler(Handler):
     def get(self):
-
-        # user = users.get_current_user()
         username = self.request.get('username')
+        password_cookie = self.request.cookies.get(username)
+        if password_cookie is None:
+            self.write('User {} is currently logged out'.format(username))
+            self.redirect(
+                    '/blog/welcome')
+        self.render('logout.html', username=username)
 
+    def post(self):
+        # TODO: user = users.get_current_user()
+        username = self.request.get('username')
 
         password_cookie = self.request.cookies.get(username)
         if password_cookie is None:
@@ -263,7 +270,7 @@ class LogOutHandler(Handler):
             # 'Set-Cookie', 'user_id=; Path=/')
             # r'.+=;\s*Path=/'
             # self.response.headers.add_header('Set-Cookie', 'username=; Path=/')
-            self.redirect('/blog/signup')
+            self.redirect('/blog/login')
 
 
 class NewPostHandler(Handler):

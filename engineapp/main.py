@@ -20,7 +20,7 @@ import jinja2
 import codecs
 import re
 import datetime
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 import hmac
 from secret import SECRET
 import random
@@ -87,28 +87,28 @@ class WelcomeHandler(Handler):
     def get(self):
         username = self.request.get("username")
         password_cookie = self.request.cookies.get(username)
-        all_posts = BlogPost.all().order('-postedAt').run(limit=5)
+        all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(5)
         if username and password_cookie:
             self.render('welcome.html', username=username, posts=all_posts)
         else:
             self.redirect('/blog/signup')
 
 
-class BlogPost(db.Model):
-    subject = db.StringProperty(required=True)
-    content = db.TextProperty(required=True)
-    postedAt = db.DateTimeProperty(auto_now_add=True)
+class BlogPost(ndb.Model):
+    subject = ndb.StringProperty(required=True)
+    content = ndb.TextProperty(required=True)
+    postedAt = ndb.DateTimeProperty(auto_now_add=True)
 
 
-class User(db.Model):
-    username = db.StringProperty(required=True)
-    password_hash = db.StringProperty(required=True)
-    email = db.StringProperty()
-    lastLoggedIn = db.DateTimeProperty(auto_now_add=True)
+class User(ndb.Model):
+    username = ndb.StringProperty(required=True)
+    password_hash = ndb.StringProperty(required=True)
+    email = ndb.StringProperty()
+    lastLoggedIn = ndb.DateTimeProperty(auto_now_add=True)
 
 
 def registered_username(name):
-    return name if db.Query(User).filter('username=', name).get() is not None else None
+    return name if ndb.Query(User).filter('username=', name).get() is not None else None
 
     # @classMethod
     # def matching_password(name, password):
@@ -235,7 +235,9 @@ class LogInHandler(Handler):
                 is_cookie_secure = valid_pw(
                     username_input, password_input, password_cookie)
                 if is_cookie_secure is not True:
-                    self.write('Entered password did not match record.')
+                    self.write(
+                        'Entered password for {} did not match record.'
+                        .format(username_input))
                     self.render('login.html')
                 else:
                     self.redirect(

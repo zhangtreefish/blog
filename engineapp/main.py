@@ -125,13 +125,13 @@ def registerUser(name, password, email=None):
 class BlogHandler(Handler):
     def get(self):
         # Model.all (keys_only=False)
-        all_posts = BlogPost.all().order('-postedAt').run(limit=5)
+        all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(5)
         self.render('blog_front.html', posts=all_posts)
 
 
 class UsersHandler(Handler):
     def get(self):
-        all_users = User.all().order('-lastLoggedIn').run(limit=5)
+        all_users = User.query().order(-User.lastLoggedIn).fetch(5)
         self.render('users.html', users=all_users)
 
 

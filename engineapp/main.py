@@ -308,7 +308,7 @@ class NewPostHandler(Handler):
             new_post = BlogPost(subject=subject, content=content)
             print(str(new_post))
             new_post.put()
-            new_post_id = new_post.key().id()
+            new_post_id = new_post.key.id()
             self.redirect(
                 webapp2.uri_for('postpermalink', post_id=new_post_id)
             )

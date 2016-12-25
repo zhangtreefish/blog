@@ -5,12 +5,14 @@
 	<label>Name
 		<input type="text" name="username" value="{{username}}">
 	</label>
-	<span style="color: red">{{username_err}}</span>
+	<span style="color: red">{{username_err_required}}</span>
+	<span style="color: red">{{username_err_nonexistent}}</span>
 	<br>
 	<label>Password
 		<input type="password" name="password" value="">
 	</label>
 	<span style="color: red">{{password_err}}</span>
+	<span style="color: red">{{password_err_nomatch}}</span>
 	<br>
 	<input type="submit">
 </form>

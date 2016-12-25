@@ -108,7 +108,7 @@ class User(ndb.Model):
 
 
 def registered_username(name):
-    return name if ndb.Query(User).filter('username=', name).get() is not None else None
+    return name if User.query(User.username==name).get() is not None else None
 
     # @classMethod
     # def matching_password(name, password):
@@ -118,8 +118,8 @@ def registered_username(name):
 def registerUser(name, password, email=None):
     password_hash = make_pw_hash(name, password) or 'pwd hash'
     user = User(username=name, password_hash=password_hash, email=email)
-    user.put()
-    return user
+    user_key = user.put()
+    return user_key.id()
 
 
 class BlogHandler(Handler):
@@ -147,8 +147,14 @@ class SignUpHandler(Handler):
 
         my_kw = {}
 
-        if username_input is None or valid_username(username_input) is None:
-            my_kw['username_err'] = "Username invalid, use only a-zA-Z0-9"
+        if username_input is None:
+            my_kw['username_err_required'] = "A username is required."
+        if valid_username(username_input) is None:
+            my_kw['username_err_nonvalid'] = '''A username is 3-20 characters
+            long and composed of a-zA-Z0-9'''
+        if registered_username(username_input) is not None:
+            my_kw['username_err_unique'] = '''Username {} is already
+            taken.'''.format(username_input)
 
         if password_input is None or valid_password(password_input) is None:
             my_kw['password_err'] = '''Password invalid, its length has to
@@ -173,7 +179,7 @@ class SignUpHandler(Handler):
                     username_input,
                     new_cookie,
                     path='/')
-                registerUser(
+                user_id = registerUser(
                     username_input,
                     password_input,
                     email_input or None
@@ -190,13 +196,13 @@ class SignUpHandler(Handler):
                     self.write('Entered password did not match record.')
                     self.render('signup.html')
                 else:
-                    registerUser(
+                    user_id = registerUser(
                         username_input,
                         password_input,
                         email_input or None
                         )
                     self.redirect(
-                        '/blog/welcome?username={}'.format(username_input)
+                        '/blog/welcome?user_id={}'.format(user_id)
                     )
 
 
@@ -210,18 +216,21 @@ class LogInHandler(Handler):
 
         my_kw = {}
 
-        if username_input is None or valid_username(username_input) is None:
-            my_kw['username_err'] = "Please enter a registered username."
+        if username_input is None:
+            my_kw['username_err_required'] = "A username is required."
+        if registered_username(username_input) is None:
+            my_kw['username_err_nonexistent'] = '''No registered user {} is
+             found.'''.format(username_input)
 
         if password_input is None or valid_password(password_input) is None:
-            my_kw['password_err'] = "That's not a valid password."
+            my_kw['password_err'] = "Need a valid password 3-20 Char. long."
 
         if my_kw:
             my_kw['username'] = username_input
             self.render('login.html', **my_kw)
 
         else:
-            password_cookie = self.request.cookies.get('username')
+            password_cookie = self.request.cookies.get(username_input)
             new_cookie = make_pw_hash(username_input, password_input)
             if password_cookie is None:
                 self.response.set_cookie(
@@ -235,10 +244,8 @@ class LogInHandler(Handler):
                 is_cookie_secure = valid_pw(
                     username_input, password_input, password_cookie)
                 if is_cookie_secure is not True:
-                    self.write(
-                        'Entered password for {} did not match record.'
-                        .format(username_input))
-                    self.render('login.html')
+                    my_kw['password_err_nomatch'] = "Password does not match."
+                    self.render('login.html', **my_kw)
                 else:
                     self.redirect(
                         '/blog/welcome?username={}'.format(username_input)

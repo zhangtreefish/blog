@@ -33,3 +33,6 @@
 1 webapp2 Building URIs: https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris<br />
 2 Deploying a Python App: https://cloud.google.com/appengine/docs/python/tools/uploadinganapp<br />
 3 quickstart: https://cloud.google.com/appengine/docs/python/quickstart
+4 Reset local datastore:  dev_appserver.py [app directory] --clear_datastore true per
+http://stackoverflow.com/questions/1010573/how-do-i-delete-all-entities-from-my-local-google-app-engine-datastore
+5. Ancestors and parent: https://cloud.google.com/appengine/docs/python/ndb/creating-entity-keys

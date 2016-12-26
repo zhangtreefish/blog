@@ -98,6 +98,7 @@ class BlogPost(ndb.Model):
     subject = ndb.StringProperty(required=True)
     content = ndb.TextProperty(required=True)
     postedAt = ndb.DateTimeProperty(auto_now_add=True)
+    author = ndb.StringProperty(required=True)
 
 
 class User(ndb.Model):
@@ -284,14 +285,21 @@ class LogOutHandler(Handler):
 
 class NewPostHandler(Handler):
     def get(self):
-        self.render('new_post.html')
+        author = self.request.get('username')
+        my_kw = {}
+        if author is None:
+            my_kw['author_err'] = 'Login is required in order to post'
+        self.render('new_post.html', **my_kw)
 
     def post(self):
+        author_name = self.request.get('username')
         subject = self.request.get('subject')
         content = self.request.get('content')
 
         my_kw = {}
 
+        if author_name is None:
+            my_kw['author_err'] = 'Login is required in order to post'
         if subject is None:
             my_kw['subject_err'] = 'Subject is a required field for blogs'
         if content is None:
@@ -305,12 +313,20 @@ class NewPostHandler(Handler):
         else:
             my_kw['subject'] = subject
             my_kw['content'] = content
-            new_post = BlogPost(subject=subject, content=content)
-            print(str(new_post))
+            author_key = User.query(User.username==author_name).get().key
+            post_id = ndb.Model.allocate_ids(size=1, parent=author_key)[0]
+            post_key = ndb.Key('BlogPost', post_id, parent=author_key)
+            new_post = BlogPost(
+                parent=author_key,
+                subject=subject,
+                content=content,
+                author=author_name)
+            self.write('str(new_post)'+str(new_post))
             new_post.put()
-            new_post_id = new_post.key.id()
+            new_post_key = new_post.key
+
             self.redirect(
-                webapp2.uri_for('postpermalink', post_id=new_post_id)
+                webapp2.uri_for('postpermalink', post_id=post_id, parent_id=author_key.id())
             )
 
 
@@ -318,9 +334,16 @@ class PostPermalinkHandler(Handler):
     def get(self, post_id):
         # print(self.request.route_args)
         # Model.get_by_id (ids, parent=None)
-        the_post = BlogPost.get_by_id(int(post_id))
+        parent_id = self.request.get('parent_id')
+        parent_key = ndb.Key('User', parent_id)
+        the_post_key = ndb.Key('BlogPost', post_id, parent=parent_key)
+        self.write('the_post_key')
+        self.write(the_post_key.urlsafe())
+        the_post = the_post_key.get()
+        # self.write('the_post.author'+the_post.content)
         self.render('post_permalink.html',
-                    id=post_id,
+
+                    author=the_post.author,
                     subject=the_post.subject,
                     content=the_post.content,
                     postedAt=the_post.postedAt)

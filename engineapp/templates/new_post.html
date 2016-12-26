@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <main>
+	<div>
+		<span style="color: red">{{author_err}}</span>
+	</div>
 	<form method="POST">
 		<label>Subject
 			<input type="text" name="subject" value="{{subject}}">

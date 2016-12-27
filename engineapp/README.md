@@ -36,3 +36,4 @@
 4 Reset local datastore:  dev_appserver.py [app directory] --clear_datastore true per
 http://stackoverflow.com/questions/1010573/how-do-i-delete-all-entities-from-my-local-google-app-engine-datastore
 5. Ancestors and parent: https://cloud.google.com/appengine/docs/python/ndb/creating-entity-keys
+6. migration from db to ndb: https://cloud.google.com/appengine/docs/python/ndb/db_to_ndb

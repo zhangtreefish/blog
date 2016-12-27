@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-	<h2>Welcome, {{username}} </h2>
-	<button type='button'><a href={{"/blog/newpost?username={}".format(username)}}> New Post </a></button>
-	<h2> All Posts </h2>
+	{% if user_id %}
+		<h2>Welcome, {{user_id}} {{username}} </h2>
+		<button type='button'><a href={{"/blog/newpost?user_id={}".format(user_id)}}> New Post </a></button>
+	{% endif %}
 	{% if posts %}
+		<h2> All Posts </h2>
 	    <div> Posts List
 	        <ol>
 	            {% for post in posts %}
@@ -17,9 +19,17 @@
 	    </div>
 	{% endif %}
 	<footer>
-	<div class="logout_hint">
-		<h2> If you would like to log out, click on the button below </h2>
-		<button type='button'><a href={{"/blog/logout?username={}".format(username)}}> Log Out </a></button>
-	</div>
-</footer>
+		<div class="signup_hint">
+			<h2> You need to sign up to create, edit and delete a post, or comment or like a post </h2>
+			<button type='button' class="signup_hint"><a href={{"/blog/signup"}}> Sign Up </a></button>
+		</div>
+		<div class="logout_hint">
+			<h2> If you would like to log out, click on the button below </h2>
+			<button type='button'><a href={{"/blog/logout?user_id={}".format(user_id)}}> Log Out </a></button>
+		</div>
+		<div class="login_hint">
+			<h2> If you already have an account, click on the Login below </h2>
+			<button type='button' class="login_hint"><a href={{"/blog/login"}}> Log In </a></button>
+		</div>
+	</footer>
 {% endblock %}

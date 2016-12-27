@@ -6,7 +6,7 @@
         <ol>
             {% for user in users %}
                 <li>
-                    <strong>{{user.username}}</strong>
+                    <strong>{{user.id}}{{user.username}}</strong>
                     <span> last on {{user.lastLoggedIn.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
                 </li>
             {% endfor %}

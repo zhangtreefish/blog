@@ -43,14 +43,30 @@ li {
 	margin: 30px;
 }
 
-.login_hint {
+.login-hint {
 	background-color: green;
 }
 
-.logout_hint {
+.logout-hint {
 	background-color: orange;
 }
 
-.signup_hint {
+.signup-hint {
 	background-color: #02b3e4;
+}
+
+.flex-container {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: center;
+}
+
+.flex-item {
+	background: tomato;
+    padding: 5px;
+  	width: 50%;
+  	margin-top: 10px;
+  	font-size: 2.0em;
+  	text-align: center;
 }

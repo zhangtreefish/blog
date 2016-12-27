@@ -8,8 +8,9 @@
 		    <textarea>content: {{content}}</textarea>
 		    <span>Posted at {{postedAt.strftime("%b %d, %Y")}}</span>
 		</main>
-		<br />
-		<div> Comment <i class="fa fa-2x fa-comment-o" aria-hidden="true"></i></div>
-		<div> Likes <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i></div>
+		<div class='flex-container'>
+			<em class='flex-item'> Comment <i class="fa fa-comment-o" aria-hidden="true"></i></em>
+			<em class='flex-item'> Likes <i class="fa fa-thumbs-up" aria-hidden="true"></i></em>
+		<div>
 	{% endif %}
 {% endblock %}

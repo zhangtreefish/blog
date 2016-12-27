@@ -22,15 +22,15 @@
 	{% endif %}
 	<footer>
 	{% if author_id %}
-		<div class="logout_hint">
+		<div class="logout-hint">
 			<h2> Done for now? Click the button below </h2>
-			<button type='button' class="logout_hint"><a href={{"/blog/logout"}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a></button>
+			<button type='button' class="logout-hint"><a href={{"/blog/logout"}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a></button>
 		</div>
 	{% endif %}
 	{% if not author_id %}
-		<div class="login_hint">
+		<div class="login-hint">
 			<h2> You have to be logged in to post. Click the Log In button below </h2>
-			<button type='button' class="login_hint"><a href={{"/blog/login"}}> Log In <i class="fa fa-sign-in" aria-hidden="true"></i></a></button>
+			<button type='button' class="login-hint"><a href={{"/blog/login"}}> Log In <i class="fa fa-sign-in" aria-hidden="true"></i></a></button>
 		</div>
 	{% endif %}
 	</footer>

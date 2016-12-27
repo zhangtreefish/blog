@@ -354,7 +354,8 @@ class PostPermalinkHandler(Handler):
                     subject=the_post.subject,
                     content=the_post.content,
                     postedAt=the_post.postedAt,
-                    author_key_string=author_key_string)
+                    author_key_string=author_key_string,
+                    author_id=author_key.id())
 
 
 # Remove debug=True before final deployment

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 	{% if author_key_string %}
+		<a href={{"/blog/welcome?user_id={}".format(author_id)}}><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
 		<main>
 		    <h2> Details of Post </h2>
 		    <span>author: {{author}}</span>

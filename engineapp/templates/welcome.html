@@ -19,17 +19,21 @@
 	    </div>
 	{% endif %}
 	<footer>
-		<div class="signup_hint">
-			<h2> You need to sign up to create, edit and delete a post, or comment or like a post </h2>
-			<button type='button' class="signup_hint"><a href={{"/blog/signup"}}> Sign Up </a></button>
-		</div>
-		<div class="logout_hint">
-			<h2> If you would like to log out, click on the button below </h2>
-			<button type='button'><a href={{"/blog/logout?user_id={}".format(user_id)}}> Log Out </a></button>
-		</div>
-		<div class="login_hint">
-			<h2> If you already have an account, click on the Login below </h2>
-			<button type='button' class="login_hint"><a href={{"/blog/login"}}> Log In </a></button>
-		</div>
+		{% if user_id %}
+			<div class="logout_hint">
+				<h2> Would you like to log out? Click on the button below. </h2>
+				<button type='button'><a href={{"/blog/logout?user_id={}".format(user_id)}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a></button>
+			</div>
+		{% endif %}
+		{% if not user_id %}
+			<div class="login_hint">
+				<h2> Already have an account? Click on the Login below. </h2>
+				<button type='button' class="login_hint"><a href={{"/blog/login"}}> Log In <i class="fa fa-sign-in" aria-hidden="true"></i></a></button>
+			</div>
+			<div class="signup_hint">
+				<h2> Would like to create, edit and delete a post, or comment or like a post? Sign up please <i class="fa fa-smile-o" aria-hidden="true"></i> </h2>
+				<button type='button' class="signup_hint"><a href={{"/blog/signup"}}> Sign Up </a></button>
+			</div>
+		{% endif %}
 	</footer>
 {% endblock %}

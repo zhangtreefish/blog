@@ -1,31 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
-<main>
-	<div>
-		<span style="color: red">{{author_err}}</span>
-	</div>
-	<form method="POST">
-		<label>Subject
-			<input type="text" name="subject" value="{{subject}}">
-		</label>
-		<span style="color: red">{{subject_err}}</span>
-		<br>
-		<label>Content
-			<textarea type="text" name="content" value="{{content}}"></textarea>
-		</label>
-		<span style="color: red">{{content_err}}</span>
-		<br>
-		<input type="submit">
-	</form>
-</main>
-<footer>
-	<div class="logout_hint">
-		<h2> If you are done for now, click the Log Out button below </h2>
-		<button type='button' class="logout_hint"><a href={{"/blog/logout"}}> Log Out </a></button>
-	</div>
-	<div class="login_hint">
-		<h2> You have to be logged in to post. Click the Log In button below </h2>
-		<button type='button' class="login_hint"><a href={{"/blog/login"}}> Log In </a></button>
-	</div>
-</footer>
+	{% if author_id %}
+		<main>
+			<div>
+				<span style="color: red">{{author_err}}</span>
+			</div>
+			<form method="POST">
+				<label>Subject
+					<input type="text" name="subject" value="{{subject}}">
+				</label>
+				<span style="color: red">{{subject_err}}</span>
+				<br>
+				<label>Content
+					<textarea type="text" name="content" value="{{content}}"></textarea>
+				</label>
+				<span style="color: red">{{content_err}}</span>
+				<br>
+				<input type="submit">
+			</form>
+		</main>
+	{% endif %}
+	<footer>
+	{% if author_id %}
+		<div class="logout_hint">
+			<h2> Done for now? Click the button below </h2>
+			<button type='button' class="logout_hint"><a href={{"/blog/logout"}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a></button>
+		</div>
+	{% endif %}
+	{% if not author_id %}
+		<div class="login_hint">
+			<h2> You have to be logged in to post. Click the Log In button below </h2>
+			<button type='button' class="login_hint"><a href={{"/blog/login"}}> Log In <i class="fa fa-sign-in" aria-hidden="true"></i></a></button>
+		</div>
+	{% endif %}
+	</footer>
 {% endblock %}

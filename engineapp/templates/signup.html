@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<form method="POST">
-	<label>Name
-		<input type="text" name="username" value="{{username}}">
-	</label>
-	<span style="color: red">{{username_err_required}}</span>
-	<span style="color: red">{{username_err_nonvalid}}</span>
-	<span style="color: red">{{username_err_unique}}</span>
-	<br>
-	<label>Password
-		<input type="password" name="password" value="">
-	</label>
-	<span style="color: red">{{password_err}}</span>
-	<br>
-	<label>Verify Password
-		<input type="password" name="verify" value="">
-	</label>
-	<span style="color: red">{{verify_err}}</span>
-	<br>
-	<label>Email
-		<input type="email" name="email" value="{{email}}">
-	</label>
-	<span style="color: red">{{email_err}}</span>
-	<br>
-	<input type="submit">
-</form>
-<footer class="login_hint">
-	<h2> If you have already signed up, click on the  Login below </h2>
-	<button type='button' class="login_hint"><a href={{"/blog/login"}}> Login </a></button>
-</footer>
+	<form method="POST">
+		<label>Name
+			<input type="text" name="username" value="{{username}}">
+		</label>
+		<span style="color: red">{{username_err_required}}</span>
+		<span style="color: red">{{username_err_nonvalid}}</span>
+		<span style="color: red">{{username_err_unique}}</span>
+		<br>
+		<label>Password
+			<input type="password" name="password" value="">
+		</label>
+		<span style="color: red">{{password_err}}</span>
+		<br>
+		<label>Verify Password
+			<input type="password" name="verify" value="">
+		</label>
+		<span style="color: red">{{verify_err}}</span>
+		<br>
+		<label>Email
+			<input type="email" name="email" value="{{email}}">
+		</label>
+		<span style="color: red">{{email_err}}</span>
+		<br>
+		<input type="submit">
+	</form>
+	<footer class="login_hint">
+		<h2> If you have already signed up, click on the Login below </h2>
+		<button type='button' class="login_hint"><a href={{"/blog/login"}}> Login <i class="fa fa-sign-in" aria-hidden="true"></i></a></button>
+	</footer>
 {% endblock %}

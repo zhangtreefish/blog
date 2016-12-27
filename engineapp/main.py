@@ -300,9 +300,9 @@ class LogOutHandler(Handler):
 
 class NewPostHandler(Handler):
     def get(self):
-        author_id = self.request.get('user_id')
         my_kw = {}
-        if author_id is None:
+        my_kw['author_id'] = self.request.get('user_id')
+        if my_kw['author_id'] is None:
             my_kw['author_err'] = 'Login is required in order to post'
         self.render('new_post.html', **my_kw)
 
@@ -349,12 +349,12 @@ class PostPermalinkHandler(Handler):
         author_key_string = self.request.get('author_key_string')
         author_key = ndb.Key(urlsafe=author_key_string)
         the_post = BlogPost.get_by_id(int(post_id), parent=author_key)
-        self.write('the_post.author'+the_post.content)
         self.render('post_permalink.html',
                     author=the_post.author,
                     subject=the_post.subject,
                     content=the_post.content,
-                    postedAt=the_post.postedAt)
+                    postedAt=the_post.postedAt,
+                    author_key_string=author_key_string)
 
 
 # Remove debug=True before final deployment

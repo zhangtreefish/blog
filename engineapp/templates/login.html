@@ -1,23 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
-<h2> Log In </h2>
-<form method="POST">
-	<label>Name
-		<input type="text" name="username" value="{{username}}">
-	</label>
-	<span style="color: red">{{username_err_required}}</span>
-	<span style="color: red">{{username_err_nonexistent}}</span>
-	<br>
-	<label>Password
-		<input type="password" name="password" value="">
-	</label>
-	<span style="color: red">{{password_err}}</span>
-	<span style="color: red">{{password_err_nomatch}}</span>
-	<br>
-	<input type="submit">
-</form>
-<footer class="signup_hint">
-	<h2> If you have not already signed up, click on the Sign Up button below </h2>
-	<button type='button' class="signup_hint"><a href={{"/blog/signup"}}> Sign Up </a></button>
-</footer>
+	<h2> Log In </h2>
+	<form method="POST">
+		<label>Name
+			<input type="text" name="username" value="{{username}}">
+		</label>
+		<span style="color: red">{{username_err_required}}</span>
+		<span style="color: red">{{username_err_nonexistent}}</span>
+		<br>
+		<label>Password
+			<input type="password" name="password" value="">
+		</label>
+		<span style="color: red">{{password_err}}</span>
+		<span style="color: red">{{password_err_nomatch}}</span>
+		<br>
+		<input type="submit">
+	</form>
+	<footer class="signup_hint">
+		<h2> If you have not already signed up, click on the Sign Up button below </h2>
+		<button type='button' class="signup_hint"><a href={{"/blog/signup"}}> Sign Up </a></button>
+	</footer>
 {% endblock %}

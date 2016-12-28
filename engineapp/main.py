@@ -29,7 +29,22 @@ import hashlib
 from google.appengine.api import users
 
 
-# The following handle setting and verification for 'password' cookie
+# Implement the hashing of user_id to be used in cookie
+def hash_str(s):
+    return hmac.new(SECRET, s).hexdigest()
+
+
+def make_secure_val(s):
+    return "%s|%s" % (s, hash_str(s))
+
+
+def check_secure_val(h):
+    val = h.split('|')[0]
+    if h == make_secure_val(val):
+        return val
+
+
+# The following handles setting and verification for password hashing
 def make_salt():
     return ''.join(random.choice(string.letters) for x in xrange(5))
 
@@ -71,6 +86,29 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                autoescape=True)
 
 
+class BlogPost(ndb.Model):
+    """Models a BlogPost entry with subject, content, author, and date."""
+    subject = ndb.StringProperty(required=True)
+    content = ndb.TextProperty(required=True)
+    postedAt = ndb.DateTimeProperty(auto_now_add=True)
+    author = ndb.StringProperty(required=True)
+
+    @classmethod
+    def query_post(cls, user_key):
+        return cls.query(ancestor=user_key).order(-cls.postedAt)
+
+
+class User(ndb.Model):
+    username = ndb.StringProperty(required=True)
+    password_hash = ndb.StringProperty(required=True)
+    email = ndb.StringProperty()
+    lastLoggedIn = ndb.DateTimeProperty(auto_now_add=True)
+
+    @classmethod
+    def query_user(cls, username):
+        return cls.query(cls.username==username).get()
+
+
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -82,58 +120,69 @@ class Handler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
+    def get_secure_cookie_val(self, cookie_name):
+        cookie_val = self.request.cookies.get(cookie_name)
+        return cookie_val and check_secure_val(cookie_val)
+
+    def initialize(self, *a, **kw):
+        webapp2.RequestHandler.initialize(self, *a, **kw)
+        user_id = self.get_secure_cookie_val("user_id")
+        self.user = user_id and User.get_by_id(int(user_id))
+
+    def registered_username(self, username):
+        """verify if a username is still available for use"""
+        return username if User.query(User.username==username).get() else None
+
+        # @classMethod
+        # def matching_password(name, password):
+        #     password_hash = make_pw_hash(name, password)
+
+    def registerUser(self, name, password, email=None):
+        password_hash = make_pw_hash(name, password) or 'pwd hash'
+        user_id = ndb.Model.allocate_ids(size=1)[0]
+        user = User(username=name, password_hash=password_hash, email=email, id=user_id)
+        user_key = user.put()
+        return user_id
+
+    def setSecureCookie(self, user_id):
+        """
+        Use cookie to establish log in session
+        TODO: implement one-time-use cookie in lieu of persistent cookie
+        """
+        user_cookie = make_secure_val(str(user_id))
+        self.response.set_cookie(
+                'user_id',
+                user_cookie,
+                path='/')
+
+    def login(self, user_id):
+        self.setSecureCookie(user_id)
+        self.redirect('/blog/welcome')
+
+    def logout(self):
+        self.response.delete_cookie('user_id')
+        self.redirect('/blog/welcome')
+
 
 class WelcomeHandler(Handler):
     def get(self):
-        user_id = self.request.get("user_id")
-        print('user_id', user_id)
-
-       # TODO
-        if user_id:
-            username = User.get_by_id(int(user_id)).username  ##
-            password_cookie = self.request.cookies.get(username)
-            if password_cookie:
-                all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(10)
-                self.render('welcome.html', user_id=user_id, username=username, posts=all_posts)
+        if self.user:
+            all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(10)
+            self.render(
+                'welcome.html',
+                user_id=self.user.key.id(),
+                username=self.user.username,
+                posts=all_posts
+            )
         else:
             self.render('welcome.html')
 
 
-class BlogPost(ndb.Model):
-    subject = ndb.StringProperty(required=True)
-    content = ndb.TextProperty(required=True)
-    postedAt = ndb.DateTimeProperty(auto_now_add=True)
-    author = ndb.StringProperty(required=True)
-
-
-class User(ndb.Model):
-    username = ndb.StringProperty(required=True)
-    password_hash = ndb.StringProperty(required=True)
-    email = ndb.StringProperty()
-    lastLoggedIn = ndb.DateTimeProperty(auto_now_add=True)
-
-
-def registered_username(name):
-    return name if User.query(User.username==name).get() is not None else None
-
-    # @classMethod
-    # def matching_password(name, password):
-    #     password_hash = make_pw_hash(name, password)
-
-
-def registerUser(name, password, email=None):
-    password_hash = make_pw_hash(name, password) or 'pwd hash'
-    user_id = ndb.Model.allocate_ids(size=1)[0]
-    user = User(username=name, password_hash=password_hash, email=email, id=user_id)
-    user_key = user.put()
-    return user_id
-
-
-class BlogHandler(Handler):
-    def get(self):
-        # Model.all (keys_only=False)
-        all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(5)
-        self.render('blog_front.html', posts=all_posts)
+# class BlogHandler(Handler):
+#     def get(self):
+#         # Model.all (keys_only=False)
+#         all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(5)
+#         self.render('blog_front.html', posts=all_posts)
 
 
 class UsersHandler(Handler):
@@ -147,86 +196,44 @@ class SignUpHandler(Handler):
         self.render('signup.html')
 
     def post(self):
-        username_input = self.request.get('username')
-        password_input = self.request.get('password')
-        verify_input = self.request.get('verify')
-        email_input = self.request.get('email')
+        username = self.request.get('username')
+        password = self.request.get('password')
+        verify = self.request.get('verify')
+        email = self.request.get('email')
 
         my_kw = {}
 
-        if username_input is None:
+        if username is None:
             my_kw['username_err_required'] = "A username is required."
-        if valid_username(username_input) is None:
+        if valid_username(username) is None:
             my_kw['username_err_nonvalid'] = '''A username is 3-20 characters
             long and composed of a-zA-Z0-9'''
-        if registered_username(username_input) is not None:
+        if registered_username(username):
             my_kw['username_err_unique'] = '''Username {} is already
-            taken.'''.format(username_input)
+            taken.'''.format(username)
 
-        if password_input is None or valid_password(password_input) is None:
+        if password is None or valid_password(password) is None:
             my_kw['password_err'] = '''Password invalid, its length has to
             be 3-20 .'''
 
-        if verify_input is None or password_input != verify_input:
+        if verify is None or password != verify:
             my_kw['verify_err'] = "Your passwords didn't match."
 
-        if email_input and valid_email(email_input) is None:
+        if email and valid_email(email) is None:
             my_kw['email_err'] = "That's not a valid email."
 
         if my_kw:
-            my_kw['username'] = username_input
-            my_kw['email'] = email_input
+            my_kw['username'] = username
+            my_kw['email'] = email
             self.render('signup.html', **my_kw)
 
         else:
-            new_cookie = make_pw_hash(username_input, password_input)
-            user_id = registerUser(
-                username_input,
-                password_input,
-                email_input or None
+            user_id = self.registerUser(
+                username,
+                password,
+                email or None
             )
-            self.response.set_cookie(
-                username_input,
-                new_cookie,
-                path='/')
-            self.redirect(
-                '/blog/welcome?user_id={}'.format(user_id))
-
-            # password_cookie = self.request.cookies.get(username_input)
-            # if password_cookie is None:
-            #     new_cookie = make_pw_hash(username_input, password_input)
-            #     user_id = registerUser(
-            #         username_input,
-            #         password_input,
-            #         email_input or None
-            #     )
-            #     self.response.set_cookie(
-            #         username_input,
-            #         new_cookie,
-            #         path='/')
-            #     self.redirect(
-            #         '/blog/welcome?user_id={}'.format(user_id))
-            # else:
-            #     self.write('Entered password did not match cookie.')
-                # is_cookie_secure = valid_pw(
-                #     username_input,
-                #     password_input,
-                #     password_cookie
-                # )
-                # if is_cookie_secure is not True:
-                #     self.write('Entered password did not match cookie.')
-                #     self.render('signup.html')
-                # else:
-                    # user_id = registerUser(
-                    #     username_input,
-                    #     password_input,
-                    #     email_input or None
-                    #     )
-                    # user = User.query(User.username==name).get()
-                    # user_id = user.key.id()
-                    # self.redirect(
-                    #     '/blog/welcome?user_id={}'.format(user_id)
-                    # )
+            self.login(user_id)
 
 
 class LogInHandler(Handler):
@@ -234,68 +241,46 @@ class LogInHandler(Handler):
         self.render('login.html')
 
     def post(self):
-        username_input = self.request.get('username')
-        password_input = self.request.get('password')
+        username = self.request.get('username')
+        password = self.request.get('password')
+        user = User.query_user(username)
 
         my_kw = {}
 
-        if username_input is None:
-            my_kw['username_err_required'] = "A username is required."
-        if registered_username(username_input) is None:
-            my_kw['username_err_nonexistent'] = '''No registered user {} is
-             found.'''.format(username_input)
+        if self.user:
+            my_kw['user_in_session'] = "user already logged in"
+            self.redirect('/blog/welcome')
 
-        if password_input is None or valid_password(password_input) is None:
+        if username is None:
+            my_kw['username_err_required'] = "A username is required."
+        if self.registered_username(username) is None:
+            my_kw['username_err_nonexistent'] = '''No registered user {} is
+             found.'''.format(username)
+        if password is None or valid_password(password) is None:
             my_kw['password_err'] = "Need a valid password 3-20 Char. long."
 
+        if valid_pw(
+                    username, password, user.password_hash) is not True:
+            my_kw['password_err_nomatch'] = "Password does not match cookie."
+
         if my_kw:
-            my_kw['username'] = username_input
+            my_kw['username'] = username
             self.render('login.html', **my_kw)
 
         else:
-            password_cookie = self.request.cookies.get(username_input)
-            new_cookie = make_pw_hash(username_input, password_input)
-            user = User.query(User.username==username_input).get()
-            user_id = user.key.id()
-            if password_cookie is None:
-                self.response.set_cookie(
-                    username_input,
-                    new_cookie,
-                    path='/')
-                self.redirect(
-                    '/blog/welcome?user_id={}'.format(user_id)
-                )
-            else:
-                is_cookie_secure = valid_pw(
-                    username_input, password_input, password_cookie)
-                if is_cookie_secure is not True:
-                    my_kw['password_err_nomatch'] = "Password does not match cookie."
-                    self.render('login.html', **my_kw)
-                else:
-                    self.redirect(
-                        '/blog/welcome?user_id={}'.format(user_id)
-                    )
+            self.login(user.key.id())
 
 
 class LogOutHandler(Handler):
     def get(self):
-        username = self.request.get('username')
-        password_cookie = self.request.cookies.get(username)
-        if password_cookie is None:
-            self.write('User {} is currently logged out'.format(username))
-            self.redirect(
-                    '/blog/welcome')
+        username = self.user.username or None
         self.render('logout.html', username=username)
 
     def post(self):
-        username = self.request.get('username')
-
-        password_cookie = self.request.cookies.get(username)
-        if password_cookie is None:
-                self.write('User {} is currently logged out'.format(username))
+        if self.user is None:
+            self.write('No one is currently logged in')
         else:
-            self.response.delete_cookie(username)
-            self.redirect('/blog/login')
+            self.logout()
 
 
 class NewPostHandler(Handler):
@@ -360,7 +345,6 @@ class PostPermalinkHandler(Handler):
 
 # Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
-    webapp2.Route(r'/blog', handler=BlogHandler, name='blog'),
     webapp2.Route(r'/blog/welcome', handler=WelcomeHandler, name='welcome'),
     webapp2.Route(r'/blog/signup', handler=SignUpHandler, name='signup'),
     webapp2.Route(r'/blog/login', handler=LogInHandler, name='login'),

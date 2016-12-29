@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-	{% if author_key_string %}
-		<a href={{"/blog/welcome?user_id={}".format(author_id)}}><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
+	{% if post_id %}
+		<a href={{"/blog/welcome"}}><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
 		<main>
 		    <h2> Details of Post </h2>
 		    <span>author: {{author}}</span>
@@ -10,7 +10,7 @@
 		    <span>Posted at {{postedAt.strftime("%b %d, %Y")}}</span>
 		</main>
 		<div class='flex-container'>
-			<em class='flex-item'> Comment <i class="fa fa-comment-o" aria-hidden="true"></i></em>
+			<em class='flex-item'> <a href={{"/blog/post/{}/newcomment".format(post_id)}}>Comment <i class="fa fa-comment-o" aria-hidden="true"></i></a></em>
 			<em class='flex-item'> Likes <i class="fa fa-thumbs-up" aria-hidden="true"></i></em>
 		<div>
 	{% endif %}

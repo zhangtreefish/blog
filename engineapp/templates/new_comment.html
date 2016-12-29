@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+	{% if user_id %}
+		<aside>
+			<form method="POST">
+				<label>Comment for post {{post_id}}
+					<textarea type="text" name="comment" value="{{comment}}"></textarea>
+				</label>
+				<br>
+				<input type="submit" value='post comment'>
+			</form>
+		</aside>
+	{% endif %}
+{% endblock %}

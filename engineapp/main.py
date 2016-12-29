@@ -244,8 +244,8 @@ class SignUpHandler(Handler):
 
 
 class LogInHandler(Handler):
-    def get(self):
-        self.render('login.html')
+    def get(self, *a, **kw):
+        self.render('login.html', *a, **kw)
 
     def post(self):
         my_kw = {}
@@ -296,20 +296,19 @@ class LogOutHandler(Handler):
 
 class NewPostHandler(Handler):
     def get(self):
-        my_kw = {}
-        my_kw['author_id'] = self.request.get('user_id')
-        if my_kw['author_id'] is None:
-            my_kw['author_err'] = 'Login is required in order to post'
-        self.render('new_post.html', **my_kw)
+        if self.user is None:
+            self.redirect('/blog/login')
+        else:
+            self.render('new_post.html', author_id=self.user.key.id())
 
     def post(self):
-        author_id = self.request.get('user_id')
+        author= self.user
         subject = self.request.get('subject')
         content = self.request.get('content')
 
         my_kw = {}
 
-        if author_id is None:
+        if author is None:
             my_kw['author_err'] = 'Login is required in order to post'
         if subject is None:
             my_kw['subject_err'] = 'Subject is a required field for blogs'
@@ -324,34 +323,39 @@ class NewPostHandler(Handler):
         else:
             my_kw['subject'] = subject
             my_kw['content'] = content
-            author = User.get_by_id(int(author_id))
-            author_key = author.key
-            post_id = ndb.Model.allocate_ids(size=1, parent=author_key)[0]
-            post_key = ndb.Key('BlogPost', post_id, parent=author_key)
+            post_id = ndb.Model.allocate_ids(size=1, parent=author.key)[0]
+            post_key = ndb.Key('BlogPost', post_id, parent=author.key)
             new_post = BlogPost(
                 id=post_id,
-                parent=author_key,
+                parent=author.key,
                 subject=subject,
                 content=content,
                 author=author.username)
             new_post.put()
             self.redirect(
-                webapp2.uri_for('postpermalink', post_id=post_id, author_key_string=author_key.urlsafe())
+                webapp2.uri_for('postpermalink', post_id=post_id)
             )
 
 
 class PostPermalinkHandler(Handler):
     def get(self, post_id):
-        author_key_string = self.request.get('author_key_string')
-        author_key = ndb.Key(urlsafe=author_key_string)
-        the_post = BlogPost.get_by_id(int(post_id), parent=author_key)
-        self.render('post_permalink.html',
+        author = self.user
+        if author is None:
+            self.redirect('/blog/login')
+        else:
+            the_post = BlogPost.get_by_id(int(post_id), parent=author.key)
+            self.render('post_permalink.html',
                     author=the_post.author,
                     subject=the_post.subject,
                     content=the_post.content,
                     postedAt=the_post.postedAt,
-                    author_key_string=author_key_string,
-                    author_id=author_key.id())
+                    post_id=post_id)
+
+
+class NewCommentHandler(Handler):
+    def get(self, post_id):
+        if self.user:
+            self.render('new_comment.html', post_id=post_id, user_id=self.user.key.id())
 
 
 # Remove debug=True before final deployment
@@ -363,5 +367,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),
     webapp2.Route(r'/blog/post/<post_id>',
                   handler=PostPermalinkHandler, name='postpermalink'),
+    webapp2.Route(r'/blog/post/<post_id>/newcomment',
+                  handler=NewCommentHandler, name='newcomment'),
     webapp2.Route(r'/blog/users', handler=UsersHandler, name='users')
 ], debug=True)

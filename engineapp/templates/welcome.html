@@ -22,7 +22,7 @@
 	{% if user_id %}
 		<div class="logout_hint">
 			<h2> Would you like to log out? Click on the button below. </h2>
-			<button type='button'><a href={{"/blog/logout?user_id={}".format(user_id)}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a></button>
+			<button type='button'><a href={{"/blog/logout"}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a></button>
 		</div>
 	{% endif %}
 	{% if not user_id %}

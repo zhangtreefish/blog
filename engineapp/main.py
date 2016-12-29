@@ -102,11 +102,17 @@ class User(ndb.Model):
     username = ndb.StringProperty(required=True)
     password_hash = ndb.StringProperty(required=True)
     email = ndb.StringProperty()
-    lastLoggedIn = ndb.DateTimeProperty(auto_now_add=True)
+    lastLoggedIn = ndb.DateTimeProperty(auto_now=True)
 
     @classmethod
     def query_user(cls, username):
         return cls.query(cls.username==username).get()
+
+    @classmethod
+    def update_lastLoggedIn(cls, user_id):
+        user = cls.get_by_id(int(user_id))
+        user.lastLoggedIn = datetime.datetime.now()
+        user.put()
 
 
 class Handler(webapp2.RequestHandler):
@@ -157,6 +163,7 @@ class Handler(webapp2.RequestHandler):
 
     def login(self, user_id):
         self.setSecureCookie(user_id)
+        User.update_lastLoggedIn(user_id)
         self.redirect('/blog/welcome')
 
     def logout(self):
@@ -241,46 +248,50 @@ class LogInHandler(Handler):
         self.render('login.html')
 
     def post(self):
+        my_kw = {}
         username = self.request.get('username')
         password = self.request.get('password')
-        user = User.query_user(username)
+        user_stored = User.query_user(username)
 
-        my_kw = {}
+        # if already logged in, go to /welcome
+        if self.user and self.user.username==username:
+            self.redirect('/blog/welcome',
+                user_id=self.user.key.id(),
+                username=username)
 
-        if self.user:
-            my_kw['user_in_session'] = "user already logged in"
-            self.redirect('/blog/welcome')
-
-        if username is None:
+        # if errors, redo /login
+        elif username is None:
             my_kw['username_err_required'] = "A username is required."
-        if self.registered_username(username) is None:
+        elif self.registered_username(username) is None:
             my_kw['username_err_nonexistent'] = '''No registered user {} is
              found.'''.format(username)
-        if password is None or valid_password(password) is None:
+        elif password is None or valid_password(password) is None:
             my_kw['password_err'] = "Need a valid password 3-20 Char. long."
-
-        if valid_pw(
-                    username, password, user.password_hash) is not True:
-            my_kw['password_err_nomatch'] = "Password does not match cookie."
-
+        elif user_stored and valid_pw(
+                    username, password, user_stored.password_hash) is not True:
+            my_kw['login_err'] = "No such username and Password on record."
         if my_kw:
             my_kw['username'] = username
             self.render('login.html', **my_kw)
 
         else:
-            self.login(user.key.id())
+            user_id = user_stored.key.id()
+            User.update_lastLoggedIn(user_id)
+            self.login(user_id)
 
 
 class LogOutHandler(Handler):
     def get(self):
-        username = self.user.username or None
-        self.render('logout.html', username=username)
+        if self.user:
+            self.render('logout.html', username=self.user.username)
+        else:
+            self.write('No one is currently logged in')
 
     def post(self):
-        if self.user is None:
-            self.write('No one is currently logged in')
-        else:
+        if self.user:
             self.logout()
+        else:
+            self.write('No one is currently logged in')
 
 
 class NewPostHandler(Handler):

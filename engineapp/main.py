@@ -94,8 +94,22 @@ class BlogPost(ndb.Model):
     author = ndb.StringProperty(required=True)
 
     @classmethod
-    def query_post(cls, user_key):
-        return cls.query(ancestor=user_key).order(-cls.postedAt)
+    def query_post(cls, username):
+        return cls.query(cls.author==username).order(-cls.postedAt)
+
+    @classmethod
+    def by_id(cls, post_id):
+        return cls.get_by_id(int(post_id))
+
+
+class Comment(ndb.Model):
+    comment = ndb.StringProperty(required=True)
+    postedAt = ndb.DateTimeProperty(auto_now_add=True)
+    commenter = ndb.StringProperty(required=True)
+
+    @classmethod
+    def query_comments(cls, post_key):
+        return cls.query(ancestor=post_key).order(-cls.postedAt)
 
 
 class User(ndb.Model):
@@ -215,7 +229,7 @@ class SignUpHandler(Handler):
         if valid_username(username) is None:
             my_kw['username_err_nonvalid'] = '''A username is 3-20 characters
             long and composed of a-zA-Z0-9'''
-        if registered_username(username):
+        if self.registered_username(username):
             my_kw['username_err_unique'] = '''Username {} is already
             taken.'''.format(username)
 
@@ -323,11 +337,10 @@ class NewPostHandler(Handler):
         else:
             my_kw['subject'] = subject
             my_kw['content'] = content
-            post_id = ndb.Model.allocate_ids(size=1, parent=author.key)[0]
-            post_key = ndb.Key('BlogPost', post_id, parent=author.key)
+            post_id = ndb.Model.allocate_ids(size=1)[0]
+            post_key = ndb.Key('BlogPost', post_id)
             new_post = BlogPost(
                 id=post_id,
-                parent=author.key,
                 subject=subject,
                 content=content,
                 author=author.username)
@@ -343,12 +356,12 @@ class PostPermalinkHandler(Handler):
         if author is None:
             self.redirect('/blog/login')
         else:
-            the_post = BlogPost.get_by_id(int(post_id), parent=author.key)
+            post = BlogPost.by_id(post_id)
             self.render('post_permalink.html',
-                    author=the_post.author,
-                    subject=the_post.subject,
-                    content=the_post.content,
-                    postedAt=the_post.postedAt,
+                    author=post.author,
+                    subject=post.subject,
+                    content=post.content,
+                    postedAt=post.postedAt,
                     post_id=post_id)
 
 
@@ -356,6 +369,23 @@ class NewCommentHandler(Handler):
     def get(self, post_id):
         if self.user:
             self.render('new_comment.html', post_id=post_id, user_id=self.user.key.id())
+
+    def post(self, post_id):
+        commenter = self.user
+        post = BlogPost.by_id(post_id)
+        if commenter and commenter.username != post.author:
+            comment = self.response.get('comment')
+            comment_id = ndb.Model.allocate_ids(size=1)[0]
+            comment_key = ndb.Key('Comment', comment_id, parent=post.key)
+            new_comment = Comment(
+                id=comment_id,
+                comment=comment,
+                commenter=commenter.username)
+            new_comment.put()
+            comments = Comment.query_comment(post.key)
+            self.redirect(
+                webapp2.uri_for('postpermalink', post_id=post_id, comments=comments)
+            )
 
 
 # Remove debug=True before final deployment

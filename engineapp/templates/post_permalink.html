@@ -8,10 +8,21 @@
 		    <span>subject: {{subject}}</span>
 		    <textarea>content: {{content}}</textarea>
 		    <span>Posted at {{postedAt.strftime("%b %d, %Y")}}</span>
+		    {% if comments %}
+		    	{% for c in comments}
+                <li>
+                    <strong> by {{c.commenter}}</strong>
+                    <span> on {{c.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+                    <textarea>{{c.comment}}</textarea>
+                </li>
+            	{% endfor %}
+		    {% endif %}
 		</main>
 		<div class='flex-container'>
 			<em class='flex-item'> <a href={{"/blog/post/{}/newcomment".format(post_id)}}>Comment <i class="fa fa-comment-o" aria-hidden="true"></i></a></em>
 			<em class='flex-item'> Likes <i class="fa fa-thumbs-up" aria-hidden="true"></i></em>
 		<div>
 	{% endif %}
+{% endblock %}
+{% block comment %}
 {% endblock %}

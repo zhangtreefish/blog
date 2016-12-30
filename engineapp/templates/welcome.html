@@ -10,6 +10,7 @@
 	        <ol>
             {% for post in posts %}
                 <li>
+                    <button type='button'><a href={{"/blog/post/{}".format(post.key.id())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a></button>
                     <strong>{{post.subject}}</strong>
                     <span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
                     <textarea>{{post.content}}</textarea>

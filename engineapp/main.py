@@ -26,7 +26,6 @@ from secret import SECRET
 import random
 import string
 import hashlib
-from google.appengine.api import users
 
 
 # Implement the hashing of user_id to be used in cookie
@@ -95,7 +94,7 @@ class BlogPost(ndb.Model):
 
     @classmethod
     def query_post(cls, username):
-        return cls.query(cls.author==username).order(-cls.postedAt)
+        return cls.query(cls.author==username).order(-cls.postedAt).get()
 
     @classmethod
     def by_id(cls, post_id):
@@ -109,7 +108,7 @@ class Comment(ndb.Model):
 
     @classmethod
     def query_comments(cls, post_key):
-        return cls.query(ancestor=post_key).order(-cls.postedAt)
+        return cls.query(ancestor=post_key).order(-cls.postedAt).fetch()
 
 
 class User(ndb.Model):
@@ -269,9 +268,7 @@ class LogInHandler(Handler):
 
         # if already logged in, go to /welcome
         if self.user and self.user.username==username:
-            self.redirect('/blog/welcome',
-                user_id=self.user.key.id(),
-                username=username)
+            self.redirect('/blog/welcome')
 
         # if errors, redo /login
         elif username is None:
@@ -316,9 +313,9 @@ class NewPostHandler(Handler):
             self.render('new_post.html', author_id=self.user.key.id())
 
     def post(self):
-        author= self.user
-        subject = self.request.get('subject')
-        content = self.request.get('content')
+        author = self.user
+        subject = self.request.get('subject') or None
+        content = self.request.get('content') or None
 
         my_kw = {}
 
@@ -332,6 +329,7 @@ class NewPostHandler(Handler):
         if my_kw:
             my_kw['subject'] = subject
             my_kw['content'] = content
+            my_kw['author_id'] = author.key.id()
             self.render('new_post.html', **my_kw)
 
         else:
@@ -356,13 +354,20 @@ class PostPermalinkHandler(Handler):
         if author is None:
             self.redirect('/blog/login')
         else:
+            # TODO: why not work?
+            # post_key = BlogPost.by_id(post_id).key
+            post_key = ndb.Key('BlogPost', post_id)
+            # TODO: why not work?
+            # post = post_key.get()
             post = BlogPost.by_id(post_id)
+            comments = Comment.query_comments(post_key)
             self.render('post_permalink.html',
                     author=post.author,
                     subject=post.subject,
                     content=post.content,
                     postedAt=post.postedAt,
-                    post_id=post_id)
+                    post_id=post_id,
+                    comments=comments)
 
 
 class NewCommentHandler(Handler):
@@ -372,20 +377,22 @@ class NewCommentHandler(Handler):
 
     def post(self, post_id):
         commenter = self.user
-        post = BlogPost.by_id(post_id)
-        if commenter and commenter.username != post.author:
-            comment = self.response.get('comment')
+        post_key = ndb.Key('BlogPost', post_id)
+        if commenter:
+            comment = self.request.get('comment')
             comment_id = ndb.Model.allocate_ids(size=1)[0]
-            comment_key = ndb.Key('Comment', comment_id, parent=post.key)
+            comment_key = ndb.Key('Comment', comment_id, parent=post_key)
             new_comment = Comment(
                 id=comment_id,
                 comment=comment,
-                commenter=commenter.username)
+                commenter=commenter.username,
+                parent=post_key)
             new_comment.put()
-            comments = Comment.query_comment(post.key)
             self.redirect(
-                webapp2.uri_for('postpermalink', post_id=post_id, comments=comments)
+                webapp2.uri_for('postpermalink', post_id=post_id)
             )
+        else:
+            self.redirect('/blog/login')
 
 
 # Remove debug=True before final deployment

@@ -38,3 +38,5 @@ http://stackoverflow.com/questions/1010573/how-do-i-delete-all-entities-from-my-
 5. Ancestors and parent: https://cloud.google.com/appengine/docs/python/ndb/creating-entity-keys
 6. migration from db to ndb: https://cloud.google.com/appengine/docs/python/ndb/db_to_ndb
 7. On the convenience a cookie offers and when not to use it: https://fishbowl.pastiche.org/2004/01/19/persistent_login_cookie_best_practice/
+8. *Programming Google App Engine with Python: Build and Run Scalable Python ...
+By Dan Sanderson*,  on https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA214&dq=required%3DTrue+not+enforced+by+ndb&source=bl&ots=lmJklvVdvb&sig=AcEdzFGzanzajz9F23-HEp_5Y8w&hl=en&sa=X&ved=0ahUKEwjmmtrvs5zRAhUjwFQKHT7zBIAQ6AEIKDAC#v=onepage&q=required%3DTrue%20not%20enforced%20by%20ndb&f=false

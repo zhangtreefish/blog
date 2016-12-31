@@ -2,7 +2,7 @@
 {% block content %}
 	{% if user_id %}
 		<h2>Welcome, {{user_id}} {{username}} </h2>
-		<button type='button'><a href={{"/blog/newpost?user_id={}".format(user_id)}}> New Post </a></button>
+		<button type='button'><a href={{"/blog/newpost"}}> New Post </a></button>
 	{% endif %}
 	{% if posts %}
 		<h2> All Posts </h2>

@@ -9,10 +9,27 @@
 		    <textarea>content: {{content}}</textarea>
 		    <span>Posted at {{postedAt.strftime("%b %d, %Y")}}</span>
 		</main>
-
 		<div class='flex-container'>
-			<em class='flex-item'> <a href={{"/blog/post/{}/newcomment".format(post_id)}}> New Comment <i class="fa fa-comment-o" aria-hidden="true"></i></a></em>
-			<em class='flex-item'> Likes <i class="fa fa-thumbs-up" aria-hidden="true"></i></em>
+			<div class='flex-item'>
+				<button type='button'>
+					<a href={{"/blog/post/{}/edit".format(post_id)}}> Edit
+						<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+					</a>
+				</button>
+				<button type='button'>
+					<a href={{"/blog/post/{}/delete".format(post_id)}}> Delete
+						<i class="fa fa-trash-o" aria-hidden="true"></i>
+					</a>
+				</button>
+			</div>
+			<button class='flex-item'>
+				<a href={{"/blog/post/{}/newcomment".format(post_id)}}> Comment
+					<i class="fa fa-comment-o" aria-hidden="true"></i>
+				</a>
+			</button>
+			<button class='flex-item'> Likes
+				<i class="fa fa-thumbs-up" aria-hidden="true"></i>
+			</button>
 		</div>
 	{% endif %}
 	{% if comments %}

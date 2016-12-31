@@ -354,12 +354,9 @@ class PostPermalinkHandler(Handler):
         if author is None:
             self.redirect('/blog/login')
         else:
-            # TODO: why not work?
-            # post_key = BlogPost.by_id(post_id).key
-            post_key = ndb.Key('BlogPost', post_id)
-            # TODO: why not work?
-            # post = post_key.get()
+            # make key out of query: compare with NewCommentHandler's post
             post = BlogPost.by_id(post_id)
+            post_key = post.key
             comments = Comment.query_comments(post_key)
             self.render('post_permalink.html',
                     author=post.author,
@@ -377,7 +374,8 @@ class NewCommentHandler(Handler):
 
     def post(self, post_id):
         commenter = self.user
-        post_key = ndb.Key('BlogPost', post_id)
+        # make key out of id, notice the int(); compare with PostPermalinkHandler's get
+        post_key = ndb.Key('BlogPost', int(post_id))
         if commenter:
             comment = self.request.get('comment')
             comment_id = ndb.Model.allocate_ids(size=1)[0]

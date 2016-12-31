@@ -11,12 +11,13 @@
 		</main>
 
 		<div class='flex-container'>
-			<em class='flex-item'> <a href={{"/blog/post/{}/newcomment".format(post_id)}}>Comment <i class="fa fa-comment-o" aria-hidden="true"></i></a></em>
+			<em class='flex-item'> <a href={{"/blog/post/{}/newcomment".format(post_id)}}> New Comment <i class="fa fa-comment-o" aria-hidden="true"></i></a></em>
 			<em class='flex-item'> Likes <i class="fa fa-thumbs-up" aria-hidden="true"></i></em>
 		</div>
 	{% endif %}
 	{% if comments %}
-    	<div> Comments
+    	<div>
+    	    <h2> All Comments </h2>
 	        <ol>
 	        {% for c in comments %}
                 <li>

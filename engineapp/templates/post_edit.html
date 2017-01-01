@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+	{% if post_id %}
+		<a href={{"/blog/welcome"}}><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
+		<main>
+			<form method="POST">
+				<label>Subject
+					<input type="text" name="subject" value="{{subject}}">
+				</label>
+				<label>Content
+					<textarea type="text" name="content" value="{{content}}"></textarea>
+				</label>
+				<input type="submit">
+			</form>
+		</main>
+		<div class='flex-container'>
+			<div class='flex-item'>
+				<button type='button'>
+					<a href={{"/blog/post/{}/edit".format(post_id)}}> Edit
+						<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+					</a>
+				</button>
+				<button type='button'>
+					<a href={{"/blog/post/{}/delete".format(post_id)}}> Delete
+						<i class="fa fa-trash-o" aria-hidden="true"></i>
+					</a>
+				</button>
+			</div>
+			<button class='flex-item'>
+				<a href={{"/blog/post/{}/newcomment".format(post_id)}}> Comment
+					<i class="fa fa-comment-o" aria-hidden="true"></i>
+				</a>
+			</button>
+			<button class='flex-item'> Likes
+				<i class="fa fa-thumbs-up" aria-hidden="true"></i>
+			</button>
+		</div>
+	{% endif %}
+	{% if comments %}
+    	<div>
+    	    <h2> All Comments </h2>
+	        <ol>
+	        {% for c in comments %}
+                <li>
+                    <strong> by {{c.commenter}}</strong>
+                    <span> on {{c.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+                    <textarea>{{c.comment}}</textarea>
+                </li>
+            {% endfor %}
+            </ol>
+        </div>
+    {% endif %}
+{% endblock %}
+

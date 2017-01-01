@@ -354,7 +354,7 @@ class PostPermalinkHandler(Handler):
         if author is None:
             self.redirect('/blog/login')
         else:
-            # make key out of query: compare with NewCommentHandler's post
+            # make key out of query: compare with NewCommentHandler's post()
             post = BlogPost.by_id(post_id)
             post_key = post.key
             comments = Comment.query_comments(post_key)
@@ -374,7 +374,7 @@ class NewCommentHandler(Handler):
 
     def post(self, post_id):
         commenter = self.user
-        # make key out of id, notice the int(); compare with PostPermalinkHandler's get
+        # make key out of id, notice the int(); compare with PostPermalinkHandler's get()
         post_key = ndb.Key('BlogPost', int(post_id))
         if commenter:
             comment = self.request.get('comment')
@@ -393,6 +393,56 @@ class NewCommentHandler(Handler):
             self.redirect('/blog/login')
 
 
+class EditPostHandler(Handler):
+    def get(self, post_id):
+        post_key = ndb.Key('BlogPost', int(post_id))
+        post = post_key.get()
+        if self.user and self.user.username == post_key.get().author:
+            comments = Comment.query_comments(post_key)
+            if len(comments) == 0:
+                self.render('post_edit.html',
+                    post_id=post_id,
+                    subject=post.subject,
+                    content=post.content)
+            else:
+                self.write('Can not edit a commented post. Respond with `Comment`')
+                self.redirect(
+                    webapp2.uri_for('postpermalink', post_id=post_id)
+                )
+        else:
+            self.write('Only a logged in author of a post can edit it.')
+            self.redirect('/blog/login')
+
+    def post(self, post_id):
+        post_key = ndb.Key('BlogPost', int(post_id))
+        if self.user:
+            if self.user.username == post_key.get().author:
+                comments = Comment.query_comments(post_key)
+                if len(comments) == 0:
+                    post = post_key.get()
+                    post.subject = self.request.get('subject')
+                    post.content = self.request.get('content')
+                    post.put()
+                else:
+                    self.write('Can not edit a commented post. Respond with `Comment`')
+                self.redirect(
+                    webapp2.uri_for('postpermalink', post_id=post_id)
+                )
+            else:
+                self.write('Only a logged in author of a post can edit it.')
+                self.redirect('/blog/welcome')
+        else:
+            self.redirect('/blog/login')
+
+
+class DeletePostHandler(Handler):
+    def post(self, post_id):
+        post_key = ndb.Key('BlogPost', int(post_id))
+        if self.user and self.user.username == post_key.get().author:
+            post_key.delete()
+        else:
+            self.write('Only a logged in author of a post can delete it.')
+
 # Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/blog/welcome', handler=WelcomeHandler, name='welcome'),
@@ -404,5 +454,9 @@ app = webapp2.WSGIApplication([
                   handler=PostPermalinkHandler, name='postpermalink'),
     webapp2.Route(r'/blog/post/<post_id>/newcomment',
                   handler=NewCommentHandler, name='newcomment'),
+    webapp2.Route(r'/blog/post/<post_id>/edit',
+                  handler=EditPostHandler, name='editpost'),
+    webapp2.Route(r'/blog/post/<post_id>/delete',
+                  handler=DeletePostHandler, name='deletepost'),
     webapp2.Route(r'/blog/users', handler=UsersHandler, name='users')
 ], debug=True)

@@ -97,7 +97,7 @@ class BlogPost(ndb.Model):
         return cls.query(cls.author==username).order(-cls.postedAt).get()
 
     @classmethod
-    def by_id(cls, post_id):
+    def from_id(cls, post_id):
         return cls.get_by_id(int(post_id))
 
 
@@ -354,17 +354,20 @@ class PostPermalinkHandler(Handler):
         if author is None:
             self.redirect('/blog/login')
         else:
-            # make key out of query: compare with NewCommentHandler's post()
-            post = BlogPost.by_id(post_id)
-            post_key = post.key
-            comments = Comment.query_comments(post_key)
-            self.render('post_permalink.html',
-                    author=post.author,
-                    subject=post.subject,
-                    content=post.content,
-                    postedAt=post.postedAt,
-                    post_id=post_id,
-                    comments=comments)
+            if post_id is None:
+                self.render('post_permalink.html')
+            else:
+                # make key out of query: compare with NewCommentHandler's post()
+                post = BlogPost.from_id(post_id)
+                post_key = post.key
+                comments = Comment.query_comments(post_key)
+                self.render('post_permalink.html',
+                        author=post.author,
+                        subject=post.subject,
+                        content=post.content,
+                        postedAt=post.postedAt,
+                        post_id=post_id,
+                        comments=comments)
 
 
 class NewCommentHandler(Handler):
@@ -436,12 +439,35 @@ class EditPostHandler(Handler):
 
 
 class DeletePostHandler(Handler):
-    def post(self, post_id):
-        post_key = ndb.Key('BlogPost', int(post_id))
-        if self.user and self.user.username == post_key.get().author:
-            post_key.delete()
+    def get(self):
+        post_id = self.request.get('post_id')
+        post = ndb.Key('BlogPost', int(post_id)).get()
+        user = self.user
+        if user and user.username == post.author:
+            self.render(
+                'post_delete.html',
+                username=user.username,
+                subject=post.subject,
+                post_id=post_id
+            )
         else:
-            self.write('Only a logged in author of a post can delete it.')
+            self.alert_not_authorized()
+
+    def post(self):
+        post_id = self.request.get('post_id')
+        post = BlogPost.from_id(post_id)
+        if self.user and self.user.username == post.author:
+            yarn = post.key.delete()
+            self.write('post.key')
+            self.write(post.key)
+            self.write(yarn)
+            self.redirect('/blog/welcome')
+        else:
+            self.alert_not_authorized()
+
+    def alert_not_authorized(self):
+        self.write('Only a logged in author of a post can delete it.')
+
 
 # Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
@@ -456,7 +482,7 @@ app = webapp2.WSGIApplication([
                   handler=NewCommentHandler, name='newcomment'),
     webapp2.Route(r'/blog/post/<post_id>/edit',
                   handler=EditPostHandler, name='editpost'),
-    webapp2.Route(r'/blog/post/<post_id>/delete',
+    webapp2.Route(r'/blog/deletepost',
                   handler=DeletePostHandler, name='deletepost'),
     webapp2.Route(r'/blog/users', handler=UsersHandler, name='users')
 ], debug=True)

@@ -17,7 +17,7 @@
 					</a>
 				</button>
 				<button type='button'>
-					<a href={{"/blog/post/{}/delete".format(post_id)}}> Delete
+					<a href={{"/blog/deletepost?post_id={}".format(post_id)}}> Delete
 						<i class="fa fa-trash-o" aria-hidden="true"></i>
 					</a>
 				</button>
@@ -45,6 +45,9 @@
             {% endfor %}
             </ol>
         </div>
+    {% endif %}
+    {% if not post_id %}
+    	<h2> No post available without post_id </h2>
     {% endif %}
 {% endblock %}
 

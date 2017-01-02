@@ -85,32 +85,6 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                autoescape=True)
 
 
-class BlogPost(ndb.Model):
-    """Models a BlogPost entry with subject, content, author, and date."""
-    subject = ndb.StringProperty(required=True)
-    content = ndb.TextProperty(required=True)
-    postedAt = ndb.DateTimeProperty(auto_now_add=True)
-    author = ndb.StringProperty(required=True)
-
-    @classmethod
-    def query_post(cls, username):
-        return cls.query(cls.author==username).order(-cls.postedAt).get()
-
-    @classmethod
-    def from_id(cls, post_id):
-        return cls.get_by_id(int(post_id))
-
-
-class Comment(ndb.Model):
-    comment = ndb.StringProperty(required=True)
-    postedAt = ndb.DateTimeProperty(auto_now_add=True)
-    commenter = ndb.StringProperty(required=True)
-
-    @classmethod
-    def query_comments(cls, post_key):
-        return cls.query(ancestor=post_key).order(-cls.postedAt).fetch()
-
-
 class User(ndb.Model):
     username = ndb.StringProperty(required=True)
     password_hash = ndb.StringProperty(required=True)
@@ -126,6 +100,32 @@ class User(ndb.Model):
         user = cls.get_by_id(int(user_id))
         user.lastLoggedIn = datetime.datetime.now()
         user.put()
+
+
+class BlogPost(ndb.Model):
+    """Models a BlogPost entry with subject, content, author, and date."""
+    subject = ndb.StringProperty(required=True)
+    content = ndb.TextProperty(required=True)
+    postedAt = ndb.DateTimeProperty(auto_now_add=True)
+    author = ndb.StringProperty(required=True)
+
+    @classmethod
+    def query_post(cls, author_key):
+        return cls.query(ancestor=author_key).order(-cls.postedAt).fetch()
+
+    @classmethod
+    def from_id(cls, post_id, author_key):
+        return cls.get_by_id(int(post_id), parent=author_key)
+
+
+class Comment(ndb.Model):
+    comment = ndb.StringProperty(required=True)
+    postedAt = ndb.DateTimeProperty(auto_now_add=True)
+    commenter = ndb.StringProperty(required=True)
+
+    @classmethod
+    def query_comments(cls, post_key):
+        return cls.query(ancestor=post_key).order(-cls.postedAt).fetch()
 
 
 class Handler(webapp2.RequestHandler):
@@ -187,12 +187,13 @@ class Handler(webapp2.RequestHandler):
 class WelcomeHandler(Handler):
     def get(self):
         if self.user:
-            all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(10)
+            # all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(10)
+            user_posts=BlogPost.query_post(self.user.key)
             self.render(
                 'welcome.html',
                 user_id=self.user.key.id(),
                 username=self.user.username,
-                posts=all_posts
+                posts=user_posts
             )
         else:
             self.render('welcome.html')
@@ -336,12 +337,13 @@ class NewPostHandler(Handler):
             my_kw['subject'] = subject
             my_kw['content'] = content
             post_id = ndb.Model.allocate_ids(size=1)[0]
-            post_key = ndb.Key('BlogPost', post_id)
+            post_key = ndb.Key('BlogPost', post_id, parent=author.key)
             new_post = BlogPost(
                 id=post_id,
                 subject=subject,
                 content=content,
-                author=author.username)
+                author=author.username,
+                parent=author.key)
             new_post.put()
             self.redirect(
                 webapp2.uri_for('postpermalink', post_id=post_id)
@@ -358,7 +360,7 @@ class PostPermalinkHandler(Handler):
                 self.render('post_permalink.html')
             else:
                 # make key out of query: compare with NewCommentHandler's post()
-                post = BlogPost.from_id(post_id)
+                post = BlogPost.from_id(post_id, author.key)
                 post_key = post.key
                 comments = Comment.query_comments(post_key)
                 self.render('post_permalink.html',
@@ -440,10 +442,10 @@ class EditPostHandler(Handler):
 
 class DeletePostHandler(Handler):
     def get(self):
-        post_id = self.request.get('post_id')
-        post = ndb.Key('BlogPost', int(post_id)).get()
         user = self.user
-        if user and user.username == post.author:
+        post_id = self.request.get('post_id')
+        post = ndb.Key('BlogPost', int(post_id), parent=user.key).get()
+        if user and post:
             self.render(
                 'post_delete.html',
                 username=user.username,
@@ -455,12 +457,9 @@ class DeletePostHandler(Handler):
 
     def post(self):
         post_id = self.request.get('post_id')
-        post = BlogPost.from_id(post_id)
-        if self.user and self.user.username == post.author:
-            yarn = post.key.delete()
-            self.write('post.key')
-            self.write(post.key)
-            self.write(yarn)
+        post = ndb.Key('BlogPost', int(post_id), parent=self.user.key).get()
+        if self.user and post:
+            post.key.delete()
             self.redirect('/blog/welcome')
         else:
             self.alert_not_authorized()

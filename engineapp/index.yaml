@@ -10,6 +10,18 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: BlogPost
+  properties:
+  - name: author
+  - name: postedAt
+    direction: desc
+
+- kind: BlogPost
+  ancestor: yes
+  properties:
+  - name: postedAt
+    direction: desc
+
 - kind: Comment
   ancestor: yes
   properties:

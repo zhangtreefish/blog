@@ -26,6 +26,7 @@ from secret import SECRET
 import random
 import string
 import hashlib
+from google.appengine.ext.db import Error, BadArgumentError
 
 
 # Implement the hashing of user_id to be used in cookie
@@ -360,9 +361,7 @@ class PostPermalinkHandler(Handler):
         if author is None:
             self.redirect('/blog/login')
         else:
-            if post_id is None:
-                self.render('post_permalink.html')
-            else:
+            try:
                 # make key out of query: compare with NewCommentHandler's post()
                 post = BlogPost.from_id(post_id, author.key)
                 post_key = post.key
@@ -374,6 +373,10 @@ class PostPermalinkHandler(Handler):
                         postedAt=post.postedAt,
                         post_id=post_id,
                         comments=comments)
+            except BadArgumentError as err:
+                print("BadArgumentError: {0}".format(err))
+            except Error as err:
+                print("Error: {0}".format(err))
 
 
 class NewCommentHandler(Handler):
@@ -404,36 +407,43 @@ class NewCommentHandler(Handler):
 
 class EditPostHandler(Handler):
     def get(self, post_id):
-        post_key = ndb.Key('BlogPost', int(post_id), parent=self.user.key)
-        post = post_key.get()
-        if self.user:
-            comments = Comment.query_comments(post_key)
-            if len(comments) == 0:
-                self.render('post_edit.html',
-                    post_id=post_id,
-                    subject=post.subject,
-                    content=post.content)
+        try:
+            if self.user:
+                post_key = ndb.Key('BlogPost', int(post_id), parent=self.user.key)
+                post = post_key.get()
+                comments = Comment.query_comments(post_key)
+                if len(comments) == 0:
+                    self.render('post_edit.html',
+                        post_id=post_id,
+                        subject=post.subject,
+                        content=post.content)
+                else:
+                    self.when_commented(post_id)
             else:
-                self.when_commented(post_id)
-        else:
-            self.when_not_authorized()
+                self.when_not_authorized()
+        except Error as err:
+            print("Error: {0}".format(err))
+
 
     def post(self, post_id):
-        post_key = ndb.Key('BlogPost', int(post_id), parent=self.user.key)
-        if self.user:
-            comments = Comment.query_comments(post_key)
-            if len(comments) == 0:
-                post = post_key.get()
-                post.subject = self.request.get('subject')
-                post.content = self.request.get('content')
-                post.put()
-                self.redirect(
-                    webapp2.uri_for('postpermalink', post_id=post_id)
-                )
+        try:
+            if self.user:
+                post_key = ndb.Key('BlogPost', int(post_id), parent=self.user.key)
+                comments = Comment.query_comments(post_key)
+                if len(comments) == 0:
+                    post = post_key.get()
+                    post.subject = self.request.get('subject')
+                    post.content = self.request.get('content')
+                    post.put()
+                    self.redirect(
+                        webapp2.uri_for('postpermalink', post_id=post_id)
+                    )
+                else:
+                    self.when_commented(post_id)
             else:
-                self.when_commented(post_id)
-        else:
-            self.when_not_authorized()
+                self.when_not_authorized()
+        except Error as err:
+            print("Error: {0}".format(err))
 
     def when_commented(self, post_id):
         self.write('Can not edit a commented post. Respond with `Comment`')
@@ -444,26 +454,31 @@ class EditPostHandler(Handler):
 class DeletePostHandler(Handler):
     def get(self):
         user = self.user
-        post_id = self.request.get('post_id')
-        post = ndb.Key('BlogPost', int(post_id), parent=user.key).get()
-        if user and post:
-            self.render(
-                'post_delete.html',
-                username=user.username,
-                subject=post.subject,
-                post_id=post_id
-            )
+        if user:
+            post_id = self.request.get('post_id')
+            post = ndb.Key('BlogPost', int(post_id), parent=user.key).get()
+            if post:
+                self.render(
+                    'post_delete.html',
+                    username=user.username,
+                    subject=post.subject,
+                    post_id=post_id
+                )
         else:
-            self.alert_not_authorized()
+            self.when_not_authorized()
 
     def post(self):
-        post_id = self.request.get('post_id')
-        post = ndb.Key('BlogPost', int(post_id), parent=self.user.key).get()
-        if self.user and post:
-            post.key.delete()
-            self.redirect('/blog/welcome')
-        else:
-            self.alert_not_authorized()
+        try:
+            post_id = self.request.get('post_id')
+            if self.user:
+                post = ndb.Key('BlogPost', int(post_id), parent=self.user.key).get()
+                if post:
+                    post.key.delete()
+                    self.redirect('/blog/welcome')
+            else:
+                self.when_not_authorized()
+        except Error as err:
+            print("Error: {0}".format(err))
 
 
 # Remove debug=True before final deployment

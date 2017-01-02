@@ -30,14 +30,14 @@
  `gcloud app deploy`
 
 ## References
-1 webapp2 Building URIs: https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris<br />
-2 Deploying a Python App: https://cloud.google.com/appengine/docs/python/tools/uploadinganapp<br />
-3 quickstart: https://cloud.google.com/appengine/docs/python/quickstart
-4 Reset local datastore:  dev_appserver.py [app directory] --clear_datastore true per
-http://stackoverflow.com/questions/1010573/how-do-i-delete-all-entities-from-my-local-google-app-engine-datastore
-5. Ancestors and parent: https://cloud.google.com/appengine/docs/python/ndb/creating-entity-keys
-6. migration from db to ndb: https://cloud.google.com/appengine/docs/python/ndb/db_to_ndb
-7. On the convenience a cookie offers and when not to use it: https://fishbowl.pastiche.org/2004/01/19/persistent_login_cookie_best_practice/
-8. *Programming Google App Engine with Python: Build and Run Scalable Python ...
-By Dan Sanderson*,  on https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA214&dq=required%3DTrue+not+enforced+by+ndb&source=bl&ots=lmJklvVdvb&sig=AcEdzFGzanzajz9F23-HEp_5Y8w&hl=en&sa=X&ved=0ahUKEwjmmtrvs5zRAhUjwFQKHT7zBIAQ6AEIKDAC#v=onepage&q=required%3DTrue%20not%20enforced%20by%20ndb&f=false
-9. Set default value to textarea tag: http://stackoverflow.com/questions/6007219/how-to-add-default-value-for-html-textarea
+1 [webapp2 Building URIs](https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris)
+2 [Deploying a Python App](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp)
+3 [quickstart](https://cloud.google.com/appengine/docs/python/quickstart)
+4 [Reset local datastore  dev_appserver.py [app directory] --clear_datastore true](http://stackoverflow.com/questions/1010573/how-do-i-delete-all-entities-from-my-local-google-app-engine-datastore)
+5. [Ancestors and parent](https://cloud.google.com/appengine/docs/python/ndb/creating-entity-keys)
+6. [migration from db to ndb](https://cloud.google.com/appengine/docs/python/ndb/db_to_ndb)
+7. [On the convenience a cookie offers and when not to use it](https://fishbowl.pastiche.org/2004/01/19/persistent_login_cookie_best_practice/)
+8. [Programming Google App Engine with Python Build and Run Scalable Python
+By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA214&dq=required%3DTrue+not+enforced+by+ndb&source=bl&ots=lmJklvVdvb&sig=AcEdzFGzanzajz9F23-HEp_5Y8w&hl=en&sa=X&ved=0ahUKEwjmmtrvs5zRAhUjwFQKHT7zBIAQ6AEIKDAC#v=onepage&q=required%3DTrue%20not%20enforced%20by%20ndb&f=false)
+9. [Set default value to textarea tag](http://stackoverflow.com/questions/6007219/how-to-add-default-value-for-html-textarea)
+10. [exceptions of ndb datastore](https://cloud.google.com/appengine/docs/python/ndb/exceptions)

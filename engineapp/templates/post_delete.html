@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+	<div class='flex-container'>
+		<a href={{"/blog/welcome"}} class='flex-item'><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
+		<a href={{"/blog/post/{}".format(post_id)}} class='flex-item'><i class="fa fa-2x fa-arrow-left" aria-hidden="true"></i>Back</a>
+	</div>
 	<h2> You are sure you want to delete post titled '{{subject}}', {{username}}? </h2>
 	<form action="/blog/deletepost?post_id={{post_id}}" method="POST">
 		<span>Yes, delete it</span>

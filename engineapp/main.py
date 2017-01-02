@@ -183,6 +183,10 @@ class Handler(webapp2.RequestHandler):
         self.response.delete_cookie('user_id')
         self.redirect('/blog/welcome')
 
+    def when_not_authorized(self):
+        self.write('Only a logged in author of a post can edit or delete it.')
+        self.redirect('/blog/login')
+
 
 class WelcomeHandler(Handler):
     def get(self):
@@ -400,9 +404,9 @@ class NewCommentHandler(Handler):
 
 class EditPostHandler(Handler):
     def get(self, post_id):
-        post_key = ndb.Key('BlogPost', int(post_id))
+        post_key = ndb.Key('BlogPost', int(post_id), parent=self.user.key)
         post = post_key.get()
-        if self.user and self.user.username == post_key.get().author:
+        if self.user:
             comments = Comment.query_comments(post_key)
             if len(comments) == 0:
                 self.render('post_edit.html',
@@ -410,35 +414,32 @@ class EditPostHandler(Handler):
                     subject=post.subject,
                     content=post.content)
             else:
-                self.write('Can not edit a commented post. Respond with `Comment`')
-                self.redirect(
-                    webapp2.uri_for('postpermalink', post_id=post_id)
-                )
+                self.when_commented(post_id)
         else:
-            self.write('Only a logged in author of a post can edit it.')
-            self.redirect('/blog/login')
+            self.when_not_authorized()
 
     def post(self, post_id):
-        post_key = ndb.Key('BlogPost', int(post_id))
+        post_key = ndb.Key('BlogPost', int(post_id), parent=self.user.key)
         if self.user:
-            if self.user.username == post_key.get().author:
-                comments = Comment.query_comments(post_key)
-                if len(comments) == 0:
-                    post = post_key.get()
-                    post.subject = self.request.get('subject')
-                    post.content = self.request.get('content')
-                    post.put()
-                else:
-                    self.write('Can not edit a commented post. Respond with `Comment`')
+            comments = Comment.query_comments(post_key)
+            if len(comments) == 0:
+                post = post_key.get()
+                post.subject = self.request.get('subject')
+                post.content = self.request.get('content')
+                post.put()
                 self.redirect(
                     webapp2.uri_for('postpermalink', post_id=post_id)
                 )
             else:
-                self.write('Only a logged in author of a post can edit it.')
-                self.redirect('/blog/welcome')
+                self.when_commented(post_id)
         else:
-            self.redirect('/blog/login')
+            self.when_not_authorized()
 
+    def when_commented(self, post_id):
+        self.write('Can not edit a commented post. Respond with `Comment`')
+        self.redirect(
+            webapp2.uri_for('postpermalink', post_id=post_id)
+        )
 
 class DeletePostHandler(Handler):
     def get(self):
@@ -463,9 +464,6 @@ class DeletePostHandler(Handler):
             self.redirect('/blog/welcome')
         else:
             self.alert_not_authorized()
-
-    def alert_not_authorized(self):
-        self.write('Only a logged in author of a post can delete it.')
 
 
 # Remove debug=True before final deployment

@@ -109,6 +109,7 @@ class BlogPost(ndb.Model):
     content = ndb.TextProperty(required=True)
     postedAt = ndb.DateTimeProperty(auto_now_add=True)
     author = ndb.StringProperty(required=True)
+    likes = ndb.IntegerProperty(default=0)
 
     @classmethod
     def query_post(cls, author_key):
@@ -185,23 +186,28 @@ class Handler(webapp2.RequestHandler):
         self.redirect('/blog/welcome')
 
     def when_not_authorized(self):
-        self.write('Only a logged in author of a post can edit or delete it.')
+        self.write("Only a logged in user can edit or delete own posts or like others' posts.")
         self.redirect('/blog/login')
 
 
 class WelcomeHandler(Handler):
     def get(self):
-        if self.user:
-            # all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(10)
-            user_posts=BlogPost.query_post(self.user.key)
-            self.render(
-                'welcome.html',
-                user_id=self.user.key.id(),
-                username=self.user.username,
-                posts=user_posts
-            )
-        else:
-            self.render('welcome.html')
+        # if only see own posts
+        # if self.user:
+        #     user_posts=BlogPost.query_post(self.user.key)
+        #     self.render(
+        #         'welcome.html',
+        #         user_id=self.user.key.id(),
+        #         username=self.user.username,
+        #         posts=user_posts
+        #     )
+        # see 10 most recent posts by all users
+
+        all_posts = BlogPost.query().order(-BlogPost.postedAt).fetch(10)
+        self.render(
+            'welcome.html',
+            posts=all_posts
+        )
 
 
 # class BlogHandler(Handler):
@@ -451,6 +457,23 @@ class EditPostHandler(Handler):
             webapp2.uri_for('postpermalink', post_id=post_id)
         )
 
+
+class LikePostHandler(Handler):
+    def post(self, post_id):
+        if self.user:
+            author_name = self.request.get('author')
+            author = User.query_user(author_name)
+            author_key = author.key.urlsafe()
+            post = ndb.Key('BlogPost', int(post_id), parent=author.key).get()
+            if self.user.username != author:
+                post.likes += 1
+                post.put()
+                self.redirect('/blog/welcome')
+            else:
+                self.write('can not like own post')
+        else:
+            self.when_not_authorized()
+
 class DeletePostHandler(Handler):
     def get(self):
         user = self.user
@@ -494,6 +517,8 @@ app = webapp2.WSGIApplication([
                   handler=NewCommentHandler, name='newcomment'),
     webapp2.Route(r'/blog/post/<post_id>/edit',
                   handler=EditPostHandler, name='editpost'),
+    webapp2.Route(r'/blog/post/<post_id>/like',
+                  handler=LikePostHandler, name='likepost'),
     webapp2.Route(r'/blog/deletepost',
                   handler=DeletePostHandler, name='deletepost'),
     webapp2.Route(r'/blog/users', handler=UsersHandler, name='users')

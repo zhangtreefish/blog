@@ -11,9 +11,15 @@
             {% for post in posts %}
                 <li>
                     <button type='button'><a href={{"/blog/post/{}".format(post.key.id())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a></button>
-                    <strong>{{post.subject}}</strong>
+					<strong> author: {{post.author}}</strong>
+                    <strong>subject:{{post.subject}}</strong>
                     <span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
                     <textarea>{{post.content}}</textarea>
+                    <em> {{post.likes}} likes </em>
+                    <form action="/blog/post/{{post.key.id()}}/like?author={{post.author}}" method="POST">
+                    	<span> like <span>
+	                    <input type="submit">
+					</form>
                 </li>
             {% endfor %}
 	        </ol>

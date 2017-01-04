@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-	{% if post_id %}
+	{% if post_key_st %}
 		<div class='flex-container'>
 			<a href={{"/blog/welcome"}} class='flex-item'><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
-			<a href={{"/blog/post/{}".format(post_id)}} class='flex-item'><i class="fa fa-2x fa-arrow-left" aria-hidden="true"></i>Back</a>
+			<a href={{"/blog/post/{}".format(post_key_st)}} class='flex-item'><i class="fa fa-2x fa-arrow-left" aria-hidden="true"></i>Back</a>
 		</div>
 		<main>
 			<form method="POST">
@@ -19,18 +19,18 @@
 		<div class='flex-container'>
 			<div class='flex-item'>
 				<button type='button'>
-					<a href={{"/blog/post/{}/edit".format(post_id)}}> Edit
+					<a href={{"/blog/post/{}/edit".format(post_key_st)}}> Edit
 						<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
 					</a>
 				</button>
 				<button type='button'>
-					<a href={{"/blog/post/{}/delete".format(post_id)}}> Delete
+					<a href={{"/blog/post/{}/delete".format(post_key_st)}}> Delete
 						<i class="fa fa-trash-o" aria-hidden="true"></i>
 					</a>
 				</button>
 			</div>
 			<button class='flex-item'>
-				<a href={{"/blog/post/{}/newcomment".format(post_id)}}> Comment
+				<a href={{"/blog/post/{}/newcomment".format(post_key_st)}}> Comment
 					<i class="fa fa-comment-o" aria-hidden="true"></i>
 				</a>
 			</button>

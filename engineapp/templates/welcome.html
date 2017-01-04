@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
+	{% if message %}
+		<div class='message'>
+			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+			{{message}}
+		</div>
+	{% endif %}
 	{% if user_id %}
 		<h2>Welcome, {{user_id}} {{username}} </h2>
 		<button type='button'><a href={{"/blog/newpost"}}> New Post </a></button>
@@ -10,15 +16,15 @@
 	        <ol>
             {% for post in posts %}
                 <li>
-                    <button type='button'><a href={{"/blog/post/{}".format(post.key.id())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a></button>
+                    <button type='button'><a href={{"/blog/post/{}".format(post.key.urlsafe())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a></button>
 					<strong> author: {{post.author}}</strong>
                     <strong>subject:{{post.subject}}</strong>
                     <span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
                     <textarea>{{post.content}}</textarea>
-                    <em> {{post.likes}} likes </em>
-                    <form action="/blog/post/{{post.key.id()}}/like?author={{post.author}}" method="POST">
-                    	<span> like <span>
-	                    <input type="submit">
+                    <em> {{post.liked_by|length}} likes </em>
+                    <form action="/blog/post/{{post.key.urlsafe()}}/like" method="POST">
+                    	<i class="fa fa-thumbs-up" aria-hidden="true"></i>
+	                    <input type="submit" value="like">
 					</form>
                 </li>
             {% endfor %}

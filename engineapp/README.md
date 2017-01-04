@@ -25,6 +25,7 @@
 * Run git clone https://github.com/zhangtreefish/blog.git
 * Run inside the directory engineapp:`dev_appserver.py . `
   and go to localhost:8080/blog
+* To run the app with fresh data:`dev_appserver.py . --clear_datastore true`
 * To deploy: create a project at Google Cloud Platform, asign
   yourself a role in the project at IAM/Admin tab. To deploy run
  `gcloud app deploy`
@@ -41,3 +42,4 @@
 By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA214&dq=required%3DTrue+not+enforced+by+ndb&source=bl&ots=lmJklvVdvb&sig=AcEdzFGzanzajz9F23-HEp_5Y8w&hl=en&sa=X&ved=0ahUKEwjmmtrvs5zRAhUjwFQKHT7zBIAQ6AEIKDAC#v=onepage&q=required%3DTrue%20not%20enforced%20by%20ndb&f=false)
 9. [Set default value to textarea tag](http://stackoverflow.com/questions/6007219/how-to-add-default-value-for-html-textarea)
 10. [exceptions of ndb datastore](https://cloud.google.com/appengine/docs/python/ndb/exceptions)
+11. [calculate list length in jinja2](http://stackoverflow.com/questions/24163579/length-of-string-in-jinja-flask)

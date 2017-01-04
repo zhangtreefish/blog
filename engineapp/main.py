@@ -185,17 +185,22 @@ class BlogHandler(webapp2.RequestHandler):
         self.response.delete_cookie('user_id')
         self.redirect('/blog/welcome')
 
+    def none_logged_in(self):
+        '''for messaging during logout'''
+        message = 'No one is currently logged in'
+        self.redirect(webapp2.uri_for('login', message=message))
+
     def when_not_authorized(self):
         '''
         handles the scenario when the user is not logged in while attempting to post
         or comment
         '''
         message = "Only a logged in user can edit or delete own posts or like others' posts."
-        self.redirect('/blog/login', message=message)
+        self.redirect(webapp2.uri_for('login', message=message))
 
     def when_no_post_key(self):
         message = 'Post key is required to display a post'
-        self.redirect('blog/welcome', message=message)
+        self.redirect(webapp2.uri_for('welcome', message=message))
 
     def go_to_post(self, post_key_st, message=''):
         '''Given a post's key str, redirected to that post's page'''
@@ -284,6 +289,7 @@ class SignUpHandler(BlogHandler):
 
 class LogInHandler(BlogHandler):
     def get(self, *a, **kw):
+        kw['message'] = self.request.get('message')
         self.render('login.html', *a, **kw)
 
     def post(self):
@@ -323,13 +329,13 @@ class LogOutHandler(BlogHandler):
         if self.user:
             self.render('logout.html', username=self.user.username)
         else:
-            self.write('No one is currently logged in')
+            self.none_logged_in()
 
     def post(self):
         if self.user:
             self.logout()
         else:
-            self.write('No one is currently logged in')
+            self.none_logged_in()
 
 
 class NewPostHandler(BlogHandler):
@@ -495,11 +501,16 @@ class LikePostHandler(BlogHandler):
             author_key = post_key.parent()
             author = author_key.get()
             message = ''
+            # can only like others' post
             if liker_name != author.username:
                 post = post_key.get()
-                post.liked_by.append(liker_name)
-                post.put()
-                message = 'Thank you for liking!'
+                # can only like a post once
+                if liker_name in post.liked_by:
+                    message = 'You have given your one like'
+                else:
+                    post.liked_by.append(liker_name)
+                    post.put()
+                    message = 'Thank you for liking!'
             else:
                 message = 'Can not like own post'
             self.go_to_post(post_key_st, message)

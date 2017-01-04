@@ -55,6 +55,10 @@ li {
 	background-color: #02b3e4;
 }
 
+.like {
+	background-color: red;
+}
+
 .flex-container {
 	display: flex;
 	flex-direction: row;

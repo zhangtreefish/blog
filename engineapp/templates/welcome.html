@@ -8,7 +8,7 @@
 	{% endif %}
 	{% if user_id %}
 		<h2>Welcome, {{user_id}} {{username}} </h2>
-		<button type='button'><a href={{"/blog/newpost"}}> New Post </a></button>
+		<a class="btn btn-info btn-large" href={{"/blog/newpost"}}> New Post </a>
 	{% endif %}
 	{% if posts %}
 		<h2> All Posts </h2>
@@ -16,15 +16,14 @@
 	        <ol>
             {% for post in posts %}
                 <li>
-                    <button type='button'><a href={{"/blog/post/{}".format(post.key.urlsafe())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a></button>
+                    <a class="btn btn-link btn-large" href={{"/blog/post/{}".format(post.key.urlsafe())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a>
 					<strong> author: {{post.author}}</strong>
                     <strong>subject:{{post.subject}}</strong>
                     <span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
                     <textarea>{{post.content}}</textarea>
-                    <em> {{post.liked_by|length}} likes </em>
+                    <em> {{post.liked_by|length}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
                     <form action="/blog/post/{{post.key.urlsafe()}}/like" method="POST">
-                    	<i class="fa fa-thumbs-up" aria-hidden="true"></i>
-	                    <input type="submit" value="like">
+                        <input class="btn btn-success" type="submit" value="like">
 					</form>
                 </li>
             {% endfor %}
@@ -35,17 +34,17 @@
 	{% if user_id %}
 		<div class="logout_hint">
 			<h2> Would you like to log out? Click on the button below. </h2>
-			<button type='button'><a href={{"/blog/logout"}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a></button>
+			<a class="btn btn-primary btn-large" href={{"/blog/logout"}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a>
 		</div>
 	{% endif %}
 	{% if not user_id %}
 		<div class="login-hint">
 			<h2> Already have an account? Click on the Login below. </h2>
-			<button type='button' class="login-hint"><a href={{"/blog/login"}}> Log In <i class="fa fa-sign-in" aria-hidden="true"></i></a></button>
+			<a class="btn btn-primary btn-large" href={{"/blog/login"}}> Log In <i class="fa fa-sign-in" aria-hidden="true"></i></a>
 		</div>
 		<div class="signup-hint">
 			<h2> Would like to create, edit and delete a post, or comment or like a post? Sign up please <i class="fa fa-smile-o" aria-hidden="true"></i> </h2>
-			<button type='button' class="signup-hint"><a href={{"/blog/signup"}}> Sign Up </a></button>
+			<a class="btn btn-primary btn-large" href={{"/blog/signup"}}> Sign Up </a>
 		</div>
 	{% endif %}
 	</footer>

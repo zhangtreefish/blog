@@ -14,29 +14,24 @@
 		    <span>subject: {{subject}}</span>
 		    <textarea>content: {{content}}</textarea>
 		    <span>Posted at {{postedAt.strftime("%b %d, %Y")}}.</span>
-		    <span class='like'>{{likes}} likes </span>
+		    <em>{{likes}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
 		</main>
 		<div class='flex-container'>
 			<div class='flex-item'>
-				<button>
-					<a href={{"/blog/post/{}/edit".format(post_key_st)}}> Edit
-						<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-					</a>
-				</button>
-				<button>
-					<a href={{"/blog/deletepost?post_key_st={}".format(post_key_st)}}> Delete
-						<i class="fa fa-trash-o" aria-hidden="true"></i>
-					</a>
-				</button>
+				<a class="btn btn-info btn-large" href={{"/blog/post/{}/edit".format(post_key_st)}}> Edit
+					<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+				</a>
+				<a class="btn btn-warning btn-large" href={{"/blog/deletepost?post_key_st={}".format(post_key_st)}}> Delete
+					<i class="fa fa-trash-o" aria-hidden="true"></i>
+				</a>
 			</div>
-			<button class='flex-item'>
-				<a href={{"/blog/post/{}/newcomment".format(post_key_st)}}> Comment
+			<div class='flex-item'>
+				<a class="btn btn-info btn-large" href={{"/blog/post/{}/newcomment".format(post_key_st)}}> Comment
 					<i class="fa fa-comment-o" aria-hidden="true"></i>
 				</a>
-			</button>
+			</div>
 			<form class='flex-item' action="/blog/post/{{post_key_st}}/like" method="POST">
-            	<i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i>
-                <input type="submit" value="like">
+                <input class="btn btn-info btn-large" type="submit" value="like">
 			</form>
 		</div>
 	{% endif %}
@@ -52,7 +47,7 @@
                     <div class='flex-container'>
 						<!-- Edit Button trigger modal -->
 						<button class="btn btn-primary btn-lg flex_item" data-toggle="modal" data-target="#editModal">
-							Edit <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+							Edit
 						</button>
 						<!-- Delete Button -->
 						<form class='flex_item' action="/blog/post/{{post_key_st}}/deletecomment?comment_key_st={{c.comment_key_st}}" method="POST">

@@ -23,19 +23,17 @@ label {
 input[type=text] {
 	display: block;
 	width: calc(100% - 2em);
-	font-size: 2em;
 	padding: 0.2em;
 }
 
-button, input[type=submit], span {
-	font-size: 2em;
+button, span, a {
+	font-size: 2em !important;
 }
 
 textarea {
 	display: block;
 	width: calc(100% - 2em);
 	height: 200px;
-	font-size: 1.8em;
 	font-family: monospace;
 }
 

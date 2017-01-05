@@ -1,5 +1,5 @@
 # A Simple Blog App Built with Google App Engine
-### Explore my app at [here](http://gaejinjablog.appspot.com/blog)
+### Explore my app at [here](http://gaejinjablog.appspot.com/blog/welcome)
 {baseUrl} = http://gaejinjablog.appspot.com/blog from here on.
 ## Features:
 --Front page that lists blog posts: {baseUrl}/welcome<br />

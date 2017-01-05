@@ -426,7 +426,7 @@ class NewCommentHandler(BlogHandler):
         if commenter:
             if post_key_st:
                 post_key = ndb.Key(urlsafe=post_key_st)
-                comment = self.request.get('comment')
+                comment = self.request.get('newcomment')
                 comment_id = ndb.Model.allocate_ids(size=1)[0]
                 comment_key = ndb.Key('Comment', comment_id, parent=post_key)
                 new_comment = Comment(

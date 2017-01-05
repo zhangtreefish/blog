@@ -1,3 +1,4 @@
+{% from 'btns_macro.html' import btns %}
 {% extends "base.html" %}
 {% block content %}
 	{% if post_key_st %}
@@ -16,7 +17,7 @@
 			<span>Posted at {{postedAt.strftime("%b %d, %Y")}}.</span>
 			<em>{{likes}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
 		</main>
-		{% include "btns.html" with context %}
+		{{btns(post_key_st)}}
 	{% endif %}
 	{% if comments %}
 		<div>

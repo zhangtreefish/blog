@@ -2,10 +2,15 @@
 ### Explore my app at [here](http://gaejinjablog.appspot.com/blog/welcome)
 {baseUrl} = http://gaejinjablog.appspot.com/blog from here on.
 ## Features:
---Front page that lists blog posts: {baseUrl}/welcome<br />
+--Front page that lists recent blog posts: {baseUrl}/welcome<br />
 --A form to submit new entries: {baseUrl}/newpost<br />
 --Blog posts have their own page: {baseUrl}/post/<post_id>.<br />
-
+--A post can be modified by its author: {baseUrl}/deletepost, or
+    {baseUrl}/post/<post_key_st>/edit<br />
+--A logged in user can comment on a post: {baseUrl}/post/<post_key_st>/newcomment<br />
+--A logged in user can like others' post: {baseUrl}/post/<post_key_st>/like<br />
+--A comment can be modified by its author: {baseUrl}/post/<post_key_st>/deletecomment,
+   or {baseUrl}/post/<post_key_st>/comment/<comment_key_st>/edit<br />
 --A signup form that validates inputs and displays error(s):
   {baseUrl}/signup; upon success the user is directed to the
   welcome page;<br />

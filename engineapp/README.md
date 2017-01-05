@@ -29,7 +29,7 @@
 
 * Run git clone https://github.com/zhangtreefish/blog.git
 * Run inside the directory engineapp:`dev_appserver.py . `
-  and go to localhost:8080/blog
+  and go to localhost:8080/blog/welcome
 * To run the app with fresh data:`dev_appserver.py . --clear_datastore true`
 * To deploy: create a project at Google Cloud Platform, asign
   yourself a role in the project at IAM/Admin tab. To deploy run

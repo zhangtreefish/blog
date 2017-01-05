@@ -19,18 +19,18 @@
 	{% include "btns.html" ignore missing with context %}
 	{% endif %}
 	{% if comments %}
-    	<div>
-    	    <h2> All Comments </h2>
-	        <ol>
-	        {% for c in comments %}
-                <li>
-                    <strong> by {{c.commenter}}</strong>
-                    <span> on {{c.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
-                    <textarea>{{c.comment}}</textarea>
-                </li>
-            {% endfor %}
-            </ol>
-        </div>
-    {% endif %}
+		<div>
+			<h2> All Comments </h2>
+			<ol>
+			{% for c in comments %}
+				<li>
+					<strong> by {{c.commenter}}</strong>
+					<span> on {{c.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+					<textarea>{{c.comment}}</textarea>
+				</li>
+			{% endfor %}
+			</ol>
+		</div>
+	{% endif %}
 {% endblock %}
 

@@ -12,23 +12,23 @@
 	{% endif %}
 	{% if posts %}
 		<h2> All Posts </h2>
-	    <div> Posts List
-	        <ol>
-            {% for post in posts %}
-                <li>
-                    <a class="btn btn-link btn-lg" href={{"/blog/post/{}".format(post.key.urlsafe())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a>
+		<div> Posts List
+			<ol>
+			{% for post in posts %}
+				<li>
+					<a class="btn btn-link btn-lg" href={{"/blog/post/{}".format(post.key.urlsafe())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a>
 					<strong> author: {{post.author}}</strong>
-                    <strong>subject:{{post.subject}}</strong>
-                    <span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
-                    <textarea>{{post.content}}</textarea>
-                    <em> {{post.liked_by|length}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
-                    <form action="/blog/post/{{post.key.urlsafe()}}/like" method="POST">
-                        <input class="btn btn-success" type="submit" value="like">
+					<strong>subject:{{post.subject}}</strong>
+					<span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+					<textarea>{{post.content}}</textarea>
+					<em> {{post.liked_by|length}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
+					<form action="/blog/post/{{post.key.urlsafe()}}/like" method="POST">
+						<input class="btn btn-success" type="submit" value="like">
 					</form>
-                </li>
-            {% endfor %}
-	        </ol>
-	    </div>
+				</li>
+			{% endfor %}
+			</ol>
+		</div>
 	{% endif %}
 	<footer>
 	{% if user_id %}

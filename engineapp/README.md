@@ -45,3 +45,6 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 11. [calculate list length in jinja2](http://stackoverflow.com/questions/24163579/length-of-string-in-jinja-flask)
 12. [create a modal in jinja2](http://stackoverflow.com/questions/21944735/what-is-the-data-target-attribute-in-bootstrap-3)
 13. [modal example](http://getbootstrap.com/javascript/#modals-examples)
+14. [include in jinja](http://jinja.pocoo.org/docs/dev/templates/#import)
+15. [css validator](https://jigsaw.w3.org/css-validator/validator)
+16. [http://pep8online.com]

@@ -94,7 +94,7 @@ class User(ndb.Model):
 
     @classmethod
     def query_user(cls, username):
-        return cls.query(cls.username==username).get()
+        return cls.query(cls.username == username).get()
 
     @classmethod
     def update_lastLoggedIn(cls, user_id):
@@ -151,9 +151,9 @@ class BlogHandler(webapp2.RequestHandler):
         user_id = self.get_secure_cookie_val("user_id")
         self.user = user_id and User.get_by_id(int(user_id))
 
-    def registered_username(self, username):
+    def registered_username(self, uname):
         """verify if a username is still available for use"""
-        return username if User.query(User.username==username).get() else None
+        return uname if User.query(User.username == uname).get() else None
 
         # @classMethod
         # def matching_password(name, password):
@@ -162,7 +162,8 @@ class BlogHandler(webapp2.RequestHandler):
     def registerUser(self, name, password, email=None):
         password_hash = make_pw_hash(name, password) or 'pwd hash'
         user_id = ndb.Model.allocate_ids(size=1)[0]
-        user = User(username=name, password_hash=password_hash, email=email, id=user_id)
+        user = User(username=name,
+                    password_hash=password_hash, email=email, id=user_id)
         user_key = user.put()
         return user_id
 
@@ -192,9 +193,8 @@ class BlogHandler(webapp2.RequestHandler):
         self.redirect(webapp2.uri_for('login', message=message))
 
     def when_not_authorized(self):
-        '''
-        handles the scenario when the user is not logged in while attempting to post
-        or comment
+        ''' handles the scenario when the user is not logged in while
+        attempting to post or comment
         '''
         message = """Only a logged in user can edit or delete own posts, like others'
         posts, or edit or delete own comments."""
@@ -207,7 +207,8 @@ class BlogHandler(webapp2.RequestHandler):
     def go_to_post(self, post_key_st, message=''):
         '''Given a post's key str, redirected to that post's page'''
         self.redirect(
-            webapp2.uri_for('postpermalink', post_key_st=post_key_st, message=message)
+            webapp2.uri_for('postpermalink',
+                            post_key_st=post_key_st, message=message)
         )
 
 
@@ -301,7 +302,7 @@ class LogInHandler(BlogHandler):
         user_stored = User.query_user(username)
 
         # if already logged in, go to /welcome
-        if self.user and self.user.username==username:
+        if self.user and self.user.username == username:
             self.redirect('/blog/welcome')
 
         # if errors, redo /login
@@ -317,7 +318,7 @@ class LogInHandler(BlogHandler):
             my_kw['login_err'] = "No such username and Password on record."
         if my_kw:
             my_kw['username'] = username
-            my_kw['message']= self.request.get('message')
+            my_kw['message'] = self.request.get('message')
             self.render('login.html', **my_kw)
 
         else:
@@ -394,14 +395,14 @@ class PostPermalinkHandler(BlogHandler):
                     post = post_key.get()
                     comments = Comment.query_comments(post_key)
                     self.render('post_permalink.html',
-                        message=message,
-                        author=post.author,
-                        subject=post.subject,
-                        content=post.content,
-                        postedAt=post.postedAt,
-                        likes=len(post.liked_by),
-                        post_key_st=post_key_st,
-                        comments=comments)
+                                message=message,
+                                author=post.author,
+                                subject=post.subject,
+                                content=post.content,
+                                postedAt=post.postedAt,
+                                likes=len(post.liked_by),
+                                post_key_st=post_key_st,
+                                comments=comments)
                 else:
                     self.when_no_post_key()
             except BadArgumentError as err:
@@ -414,7 +415,9 @@ class NewCommentHandler(BlogHandler):
     def get(self, post_key_st):
         if self.user:
             post_key = ndb.Key(urlsafe=post_key_st)
-            self.render('new_comment.html', post_key_st=post_key_st, post_id=post_key.id())
+            self.render('new_comment.html',
+                        post_key_st=post_key_st,
+                        post_id=post_key.id())
         else:
             self.when_not_authorized()
 
@@ -484,7 +487,6 @@ class DeleteCommentHandler(BlogHandler):
             print("Error: {0}".format(err))
 
 
-
 class EditPostHandler(BlogHandler):
     def get(self, post_key_st):
         try:
@@ -503,9 +505,9 @@ class EditPostHandler(BlogHandler):
                 else:
                     post = post_key.get()
                     self.render('post_edit.html',
-                        post_key_st=post_key_st,
-                        subject=post.subject,
-                        content=post.content)
+                                post_key_st=post_key_st,
+                                subject=post.subject,
+                                content=post.content)
             else:
                 self.when_not_authorized()
         except Error as err:

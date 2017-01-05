@@ -43,3 +43,5 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 9. [Set default value to textarea tag](http://stackoverflow.com/questions/6007219/how-to-add-default-value-for-html-textarea)
 10. [exceptions of ndb datastore](https://cloud.google.com/appengine/docs/python/ndb/exceptions)
 11. [calculate list length in jinja2](http://stackoverflow.com/questions/24163579/length-of-string-in-jinja-flask)
+12. [create a modal in jinja2](http://stackoverflow.com/questions/21944735/what-is-the-data-target-attribute-in-bootstrap-3)
+13. [modal example](http://getbootstrap.com/javascript/#modals-examples)

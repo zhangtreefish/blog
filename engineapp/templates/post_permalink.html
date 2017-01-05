@@ -18,12 +18,12 @@
 		</main>
 		<div class='flex-container'>
 			<div class='flex-item'>
-				<button type='button'>
+				<button>
 					<a href={{"/blog/post/{}/edit".format(post_key_st)}}> Edit
 						<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
 					</a>
 				</button>
-				<button type='button'>
+				<button>
 					<a href={{"/blog/deletepost?post_key_st={}".format(post_key_st)}}> Delete
 						<i class="fa fa-trash-o" aria-hidden="true"></i>
 					</a>
@@ -49,6 +49,34 @@
                     <strong> by {{c.commenter}}</strong>
                     <span> on {{c.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
                     <textarea>{{c.comment}}</textarea>
+                    <div class='flex-container'>
+						<!-- Edit Button trigger modal -->
+						<button class="btn btn-primary btn-lg flex_item" data-toggle="modal" data-target="#editModal">
+							Edit <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+						</button>
+						<!-- Delete Button -->
+						<form class='flex_item' action="/blog/post/{{post_key_st}}/deletecomment?comment_key_st={{c.comment_key_st}}" method="POST">
+							<input type="submit" value='Delete' class="btn btn-warning">
+						</form>
+					</div>
+					<!-- Edit Button Modal -->
+					<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+					  <div class="modal-dialog" role="document">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					      </div>
+					      <div class="modal-body">
+					        <form action="/blog/post/{{post_key_st}}/comment/{{c.comment_key_st}}/edit" method="POST">
+								<label>Comment
+									<textarea type="text" name="comment"> {{c.comment}}</textarea>
+								</label>
+								<input type="submit">
+							</form>
+					      </div>
+					    </div><!-- /.modal-content -->
+					  </div><!-- /.modal-dialog -->
+					</div><!-- /.modal -->
                 </li>
             {% endfor %}
             </ol>

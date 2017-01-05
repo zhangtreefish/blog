@@ -121,6 +121,7 @@ class BlogPost(ndb.Model):
 
 
 class Comment(ndb.Model):
+    comment_key_st = ndb.StringProperty(required=True)
     comment = ndb.StringProperty(required=True)
     postedAt = ndb.DateTimeProperty(auto_now_add=True)
     commenter = ndb.StringProperty(required=True)
@@ -195,7 +196,8 @@ class BlogHandler(webapp2.RequestHandler):
         handles the scenario when the user is not logged in while attempting to post
         or comment
         '''
-        message = "Only a logged in user can edit or delete own posts or like others' posts."
+        message = """Only a logged in user can edit or delete own posts, like others'
+        posts, or edit or delete own comments."""
         self.redirect(webapp2.uri_for('login', message=message))
 
     def when_no_post_key(self):
@@ -428,6 +430,7 @@ class NewCommentHandler(BlogHandler):
                     id=comment_id,
                     comment=comment,
                     commenter=commenter.username,
+                    comment_key_st=comment_key.urlsafe(),
                     parent=post_key)
                 new_comment.put()
                 self.go_to_post(post_key_st)
@@ -435,6 +438,51 @@ class NewCommentHandler(BlogHandler):
                 self.when_no_post_key()
         else:
             self.when_not_authorized()
+
+
+class EditCommentHandler(BlogHandler):
+    def post(self, post_key_st, comment_key_st):
+        try:
+            if self.user:
+                comment_key = ndb.Key(urlsafe=comment_key_st)
+                comment = comment_key.get()
+                editor_name = self.user.username
+                comment_author_name = comment.commenter
+                message = ''
+                if editor_name == comment_author_name:
+                    comment.comment = self.request.get('comment')
+                    comment.put()
+                    message = 'Comment successfully edited!'
+                else:
+                    message = "Can not edit others' comment"
+                self.go_to_post(post_key_st, message)
+            else:
+                self.when_not_authorized()
+        except Error as err:
+            print("Error: {0}".format(err))
+
+
+class DeleteCommentHandler(BlogHandler):
+    def post(self, post_key_st):
+        try:
+            if self.user:
+                deleter_name = self.user.username
+                comment_key_st = self.request.get('comment_key_st')
+                comment_key = ndb.Key(urlsafe=comment_key_st)
+                comment = comment_key.get()
+                comment_author_name = comment.commenter
+                message = ''
+                if deleter_name == comment_author_name:
+                    comment_key.delete()
+                    message = 'Comment successfully deleted!'
+                else:
+                    message = "Can not delete others' comment"
+                self.go_to_post(post_key_st, message)
+            else:
+                self.when_not_authorized()
+        except Error as err:
+            print("Error: {0}".format(err))
+
 
 
 class EditPostHandler(BlogHandler):
@@ -462,7 +510,6 @@ class EditPostHandler(BlogHandler):
                 self.when_not_authorized()
         except Error as err:
             print("Error: {0}".format(err))
-
 
     def post(self, post_key_st):
         try:
@@ -579,6 +626,10 @@ app = webapp2.WSGIApplication([
                   handler=PostPermalinkHandler, name='postpermalink'),
     webapp2.Route(r'/blog/post/<post_key_st>/newcomment',
                   handler=NewCommentHandler, name='newcomment'),
+    webapp2.Route(r'/blog/post/<post_key_st>/comment/<comment_key_st>/edit',
+                  handler=EditCommentHandler, name='editcomment'),
+    webapp2.Route(r'/blog/post/<post_key_st>/deletecomment',
+                  handler=DeleteCommentHandler, name='deletecomment'),
     webapp2.Route(r'/blog/post/<post_key_st>/edit',
                   handler=EditPostHandler, name='editpost'),
     webapp2.Route(r'/blog/post/<post_key_st>/like',

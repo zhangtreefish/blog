@@ -16,22 +16,16 @@
 				</label>
 				<span style="color: red">{{content_err}}</span>
 				<br>
-				<input class="btn btn-success btn-large" type="submit">
+				<input class="btn btn-success btn-lg" type="submit">
 			</form>
 		</main>
 	{% endif %}
 	<footer>
 	{% if author_id %}
-		<div class="logout-hint">
-			<h2> Done for now? Click the button below </h2>
-			<a href={{"/blog/logout"}} class="btn btn-primary btn-large"> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a>
-		</div>
+		{% include "logout_btn.html" with context %}
 	{% endif %}
 	{% if not author_id %}
-		<div class="login-hint">
-			<h2> You have to be logged in to post. Click the Log In button below </h2>
-			<a href={{"/blog/login"}} class="btn btn-primary btn-large"> Log In <i class="fa fa-sign-in" aria-hidden="true"></i></a>
-		</div>
+		{% include "login_btn.html" with context %}
 	{% endif %}
 	</footer>
 {% endblock %}

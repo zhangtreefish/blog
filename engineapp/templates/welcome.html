@@ -8,7 +8,7 @@
 	{% endif %}
 	{% if user_id %}
 		<h2>Welcome, {{user_id}} {{username}} </h2>
-		<a class="btn btn-info btn-large" href={{"/blog/newpost"}}> New Post </a>
+		<a class="btn btn-info btn-lg" href={{"/blog/newpost"}}> New Post </a>
 	{% endif %}
 	{% if posts %}
 		<h2> All Posts </h2>
@@ -16,7 +16,7 @@
 	        <ol>
             {% for post in posts %}
                 <li>
-                    <a class="btn btn-link btn-large" href={{"/blog/post/{}".format(post.key.urlsafe())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a>
+                    <a class="btn btn-link btn-lg" href={{"/blog/post/{}".format(post.key.urlsafe())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a>
 					<strong> author: {{post.author}}</strong>
                     <strong>subject:{{post.subject}}</strong>
                     <span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
@@ -32,20 +32,11 @@
 	{% endif %}
 	<footer>
 	{% if user_id %}
-		<div class="logout_hint">
-			<h2> Would you like to log out? Click on the button below. </h2>
-			<a class="btn btn-primary btn-large" href={{"/blog/logout"}}> Log Out <i class="fa fa-sign-out" aria-hidden="true"></i></a>
-		</div>
+		{% include "logout_btn.html" with context %}
 	{% endif %}
 	{% if not user_id %}
-		<div class="login-hint">
-			<h2> Already have an account? Click on the Login below. </h2>
-			<a class="btn btn-primary btn-large" href={{"/blog/login"}}> Log In <i class="fa fa-sign-in" aria-hidden="true"></i></a>
-		</div>
-		<div class="signup-hint">
-			<h2> Would like to create, edit and delete a post, or comment or like a post? Sign up please <i class="fa fa-smile-o" aria-hidden="true"></i> </h2>
-			<a class="btn btn-primary btn-large" href={{"/blog/signup"}}> Sign Up </a>
-		</div>
+		{% include "logout_btn.html" with context %}
+		{% include "signup_btn.html" with context %}
 	{% endif %}
 	</footer>
 {% endblock %}

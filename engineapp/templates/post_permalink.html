@@ -16,24 +16,7 @@
 		    <span>Posted at {{postedAt.strftime("%b %d, %Y")}}.</span>
 		    <em>{{likes}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
 		</main>
-		<div class='flex-container'>
-			<div class='flex-item'>
-				<a class="btn btn-info btn-large" href={{"/blog/post/{}/edit".format(post_key_st)}}> Edit
-					<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-				</a>
-				<a class="btn btn-warning btn-large" href={{"/blog/deletepost?post_key_st={}".format(post_key_st)}}> Delete
-					<i class="fa fa-trash-o" aria-hidden="true"></i>
-				</a>
-			</div>
-			<div class='flex-item'>
-				<a class="btn btn-info btn-large" href={{"/blog/post/{}/newcomment".format(post_key_st)}}> Comment
-					<i class="fa fa-comment-o" aria-hidden="true"></i>
-				</a>
-			</div>
-			<form class='flex-item' action="/blog/post/{{post_key_st}}/like" method="POST">
-                <input class="btn btn-info btn-large" type="submit" value="like">
-			</form>
-		</div>
+		{% include "btns.html" with context %}
 	{% endif %}
 	{% if comments %}
     	<div>
@@ -51,7 +34,7 @@
 						</button>
 						<!-- Delete Button -->
 						<form class='flex_item' action="/blog/post/{{post_key_st}}/deletecomment?comment_key_st={{c.comment_key_st}}" method="POST">
-							<input type="submit" value='Delete' class="btn btn-warning">
+							<input type="submit" value='Delete' class="btn btn-warning btn-lg">
 						</form>
 					</div>
 					<!-- Edit Button Modal -->

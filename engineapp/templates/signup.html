@@ -23,10 +23,7 @@
 		</label>
 		<span style="color: red">{{email_err}}</span>
 		<br>
-		<input type="submit" class="btn btn-success btn-large">
+		<input type="submit" class="btn btn-success btn-lg">
 	</form>
-	<footer class="login-hint">
-		<h2> If you have already signed up, click on the Login below </h2>
-		<a class="btn btn-primary btn-large" href={{"/blog/login"}}> Login <i class="fa fa-sign-in" aria-hidden="true"></i></a>
-	</footer>
+	{% include "login_btn.html" with context %}
 {% endblock %}

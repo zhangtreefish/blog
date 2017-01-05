@@ -16,30 +16,7 @@
 				<input type="submit">
 			</form>
 		</main>
-		<div class='flex-container'>
-			<div class='flex-item'>
-				<button type='button'>
-					<a href={{"/blog/post/{}/edit".format(post_key_st)}}> Edit
-						<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-					</a>
-				</button>
-				<button type='button'>
-					<a href={{"/blog/post/{}/delete".format(post_key_st)}}> Delete
-						<i class="fa fa-trash-o" aria-hidden="true"></i>
-					</a>
-				</button>
-			</div>
-			<button class='flex-item'>
-				<a href={{"/blog/post/{}/newcomment".format(post_key_st)}}> Comment
-					<i class="fa fa-comment-o" aria-hidden="true"></i>
-				</a>
-			</button>
-			<form class='flex-item' action="/blog/post/{{post_key_st}}/like" method="POST">
-                <input class="btn btn-info btn-large" type="submit" value="like">
-			</form>
-			<!-- <button class='flex-item'> Like
-			</button> -->
-		</div>
+	{% include "btns.html" ignore missing with context %}
 	{% endif %}
 	{% if comments %}
     	<div>

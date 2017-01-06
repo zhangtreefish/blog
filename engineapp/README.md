@@ -54,3 +54,4 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 15. [css validator](https://jigsaw.w3.org/css-validator/validator)<br />
 16. [http://pep8online.com]<br />
 17. [jinja macro](http://stackoverflow.com/questions/9404990/how-to-pass-selected-named-arguments-to-jinja2s-include-context)
+18. [set unique modal ids](http://stackoverflow.com/questions/40937631/modals-created-in-jinja-conditional-statement-are-all-showing-the-same-data)

@@ -12,7 +12,7 @@
 	{% endif %}
 	{% if posts %}
 		<h2> All Posts </h2>
-		<div> Posts List
+		<div>
 			<ol>
 			{% for post in posts %}
 				<li>
@@ -35,7 +35,7 @@
 		{% include "logout_btn.html" with context %}
 	{% endif %}
 	{% if not user_id %}
-		{% include "logout_btn.html" with context %}
+		{% include "login_btn.html" with context %}
 		{% include "signup_btn.html" with context %}
 	{% endif %}
 	</footer>

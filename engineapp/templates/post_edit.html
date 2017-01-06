@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 	{% if post_key_st %}
-		<div class='flex-container'>
-			<a href={{"/blog/welcome"}} class='flex-item'><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
-			<a href={{"/blog/post/{}".format(post_key_st)}} class='flex-item'><i class="fa fa-2x fa-arrow-left" aria-hidden="true"></i>Back</a>
-		</div>
 		<main>
 			<form method="POST">
 				<label>Subject
@@ -13,7 +9,8 @@
 				<label>Content
 					<textarea type="text" name="content">{{content}}</textarea>
 				</label>
-				<input type="submit">
+				<input type="submit" class="btn btn-success btn-sm">
+				<a href={{"/post/{}".format(post_key_st)}} class="btn btn-primary btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>Cancel</a>
 			</form>
 		</main>
 	{% include "btns.html" ignore missing with context %}

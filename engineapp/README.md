@@ -1,6 +1,6 @@
 # A Simple Blog App Built with Google App Engine
-### Explore my app at [here](http://gaejinjablog.appspot.com/blog/welcome)
-{baseUrl} = http://gaejinjablog.appspot.com/blog from here on.
+### Explore my app at [here](http://gaejinjablog.appspot.com)
+{baseUrl} = http://gaejinjablog.appspot.com from here on.
 ## Features:
 --Front page that lists recent blog posts: {baseUrl}/welcome<br />
 --A form to submit new entries: {baseUrl}/newpost<br />
@@ -29,7 +29,7 @@
 
 * Run git clone https://github.com/zhangtreefish/blog.git
 * Run inside the directory engineapp:`dev_appserver.py . `
-  and go to localhost:8080/blog/welcome
+  and go to localhost:8080
 * To run the app with fresh data:`dev_appserver.py . --clear_datastore true`
 * To deploy: create a project at Google Cloud Platform, asign
   yourself a role in the project at IAM/Admin tab. To deploy run

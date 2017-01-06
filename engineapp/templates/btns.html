@@ -1,19 +1,19 @@
 <div class='flex-container'>
 	<div class='flex-item'>
-		<a class="btn btn-info btn-lg" href={{"/blog/post/{}/edit".format(post_key_st)}}> Edit
+		<a class="btn btn-info btn-lg" href={{"/post/{}/edit".format(post_key_st)}}> Edit
 			<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
 		</a>
-		<a class="btn btn-warning btn-lg" href={{"/blog/deletepost?post_key_st={}".format(post_key_st)}}> Delete
+		<a class="btn btn-warning btn-lg" href={{"/deletepost?post_key_st={}".format(post_key_st)}}> Delete
 			<i class="fa fa-trash-o" aria-hidden="true"></i>
 		</a>
 	</div>
 	<div class='flex-item'>
-		<a class="btn btn-info btn-lg" href={{"/blog/post/{}/newcomment".format(post_key_st)}}> Comment
+		<a class="btn btn-info btn-lg" href={{"/post/{}/newcomment".format(post_key_st)}}> Comment
 			<i class="fa fa-comment-o" aria-hidden="true"></i>
 		</a>
 	</div>
 	<div class='flex-item'>
-		<form action="/blog/post/{{post_key_st}}/like" method="POST">
+		<form action="/post/{{post_key_st}}/like" method="POST">
 			<input class="btn btn-info btn-lg" type="submit" value="like">
 		</form>
 	</div>

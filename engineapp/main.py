@@ -181,11 +181,11 @@ class BlogHandler(webapp2.RequestHandler):
     def login(self, user_id):
         self.setSecureCookie(user_id)
         User.update_lastLoggedIn(user_id)
-        self.redirect('/blog/welcome')
+        self.redirect('/welcome')
 
     def logout(self):
         self.response.delete_cookie('user_id')
-        self.redirect('/blog/welcome')
+        self.redirect('/welcome')
 
     def none_logged_in(self):
         '''for messaging during logout'''
@@ -303,7 +303,7 @@ class LogInHandler(BlogHandler):
 
         # if already logged in, go to /welcome
         if self.user and self.user.username == username:
-            self.redirect('/blog/welcome')
+            self.redirect('/welcome')
 
         # if errors, redo /login
         elif username is None:
@@ -344,7 +344,7 @@ class LogOutHandler(BlogHandler):
 class NewPostHandler(BlogHandler):
     def get(self):
         if self.user is None:
-            self.redirect('/blog/login')
+            self.redirect('/login')
         else:
             self.render('new_post.html', author_id=self.user.key.id())
 
@@ -386,7 +386,7 @@ class NewPostHandler(BlogHandler):
 class PostPermalinkHandler(BlogHandler):
     def get(self, post_key_st):
         if self.user is None:
-            self.redirect('/blog/login')
+            self.redirect('/login')
         else:
             try:
                 if post_key_st:
@@ -603,7 +603,7 @@ class DeletePostHandler(BlogHandler):
                 if len(comments) == 0 and deleter_name == author.username:
                     post = post_key.get()
                     post.key.delete()
-                    self.redirect('/blog/welcome')
+                    self.redirect('/welcome')
                 else:
                     self.can_not_delete(post_key_st)
             else:
@@ -619,24 +619,25 @@ class DeletePostHandler(BlogHandler):
 
 # Remove debug=True before final deployment
 app = webapp2.WSGIApplication([
-    webapp2.Route(r'/blog/welcome', handler=WelcomeHandler, name='welcome'),
-    webapp2.Route(r'/blog/signup', handler=SignUpHandler, name='signup'),
-    webapp2.Route(r'/blog/login', handler=LogInHandler, name='login'),
-    webapp2.Route(r'/blog/logout', handler=LogOutHandler, name='logout'),
-    webapp2.Route(r'/blog/newpost', handler=NewPostHandler, name='newpost'),
-    webapp2.Route(r'/blog/post/<post_key_st>',
+    webapp2.Route(r'/', handler=WelcomeHandler, name='welcome'),
+    webapp2.Route(r'/welcome', handler=WelcomeHandler, name='welcome'),
+    webapp2.Route(r'/signup', handler=SignUpHandler, name='signup'),
+    webapp2.Route(r'/login', handler=LogInHandler, name='login'),
+    webapp2.Route(r'/logout', handler=LogOutHandler, name='logout'),
+    webapp2.Route(r'/newpost', handler=NewPostHandler, name='newpost'),
+    webapp2.Route(r'/post/<post_key_st>',
                   handler=PostPermalinkHandler, name='postpermalink'),
-    webapp2.Route(r'/blog/post/<post_key_st>/newcomment',
+    webapp2.Route(r'/post/<post_key_st>/newcomment',
                   handler=NewCommentHandler, name='newcomment'),
-    webapp2.Route(r'/blog/post/<post_key_st>/comment/<comment_key_st>/edit',
+    webapp2.Route(r'/post/<post_key_st>/comment/<comment_key_st>/edit',
                   handler=EditCommentHandler, name='editcomment'),
-    webapp2.Route(r'/blog/post/<post_key_st>/deletecomment',
+    webapp2.Route(r'/post/<post_key_st>/deletecomment',
                   handler=DeleteCommentHandler, name='deletecomment'),
-    webapp2.Route(r'/blog/post/<post_key_st>/edit',
+    webapp2.Route(r'/post/<post_key_st>/edit',
                   handler=EditPostHandler, name='editpost'),
-    webapp2.Route(r'/blog/post/<post_key_st>/like',
+    webapp2.Route(r'/post/<post_key_st>/like',
                   handler=LikePostHandler, name='likepost'),
-    webapp2.Route(r'/blog/deletepost',
+    webapp2.Route(r'/deletepost',
                   handler=DeletePostHandler, name='deletepost'),
-    webapp2.Route(r'/blog/users', handler=UsersHandler, name='users')
+    webapp2.Route(r'/users', handler=UsersHandler, name='users')
 ], debug=True)

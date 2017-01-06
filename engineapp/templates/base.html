@@ -12,7 +12,13 @@
 		<link type="text/css" rel="stylesheet" href="/static/main.css" />
 	</head>
 	<body>
-		<h1>I Remember 回忆</h1>
+		<div class='flex-container'>
+			<strong class='flex-item'>I Remember 回忆</strong>
+			<nav class='flex-item'>
+				<a href={{"/welcome"}} class='flex-item'><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
+				<a href={{"/login"}}> &nbsp;<i class="fa fa-2x fa-sign-in" aria-hidden="true"></i></a>
+			</nav>
+		</div>
 		{% block content %}
 		{% endblock %}
 		<p>

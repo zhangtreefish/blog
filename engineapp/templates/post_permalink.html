@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 {% block content %}
 	{% if post_key_st %}
-		<a href={{"/blog/welcome"}}><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
+		<a href={{"/welcome"}}><i class="fa fa-2x fa-home" aria-hidden="true"></i></a>
 		{% if message %}
 			<div class='message'>
 				<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -15,7 +15,7 @@
 			<span>subject: {{subject}}</span>
 			<textarea>content: {{content}}</textarea>
 			<span>Posted at {{postedAt.strftime("%b %d, %Y")}}.</span>
-			<em>{{likes}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
+			<em class='like'>{{likes}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
 		</main>
 		{{btns(post_key_st)}}
 	{% endif %}
@@ -43,7 +43,7 @@
 										</button>
 									</div>
 									<div class="modal-body">
-										<form action="/blog/post/{{post_key_st}}/comment/{{c.comment_key_st}}/edit" method="POST">
+										<form action="/post/{{post_key_st}}/comment/{{c.comment_key_st}}/edit" method="POST">
 											<label>Comment
 												<textarea type="text" name="comment"> {{c.comment}}</textarea>
 											</label>
@@ -54,7 +54,7 @@
 							</div><!-- /.modal-dialog -->
 						</div><!-- /.modal -->
 						<!-- Delete Button -->
-						<form class='flex_item' action="/blog/post/{{post_key_st}}/deletecomment?comment_key_st={{c.comment_key_st}}" method="POST">
+						<form class='flex_item' action="/post/{{post_key_st}}/deletecomment?comment_key_st={{c.comment_key_st}}" method="POST">
 							<input type="submit" value='Delete' class="btn btn-warning btn-lg">
 						</form>
 					</div>

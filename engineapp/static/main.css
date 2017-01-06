@@ -17,7 +17,6 @@ footer {
 
 label {
 	display: block;
-	font-size: 2em;
 }
 
 input[type=text] {
@@ -26,7 +25,7 @@ input[type=text] {
 	padding: 0.2em;
 }
 
-button, span, input[type=submit], a {
+button, span, input[type=submit], input[type=text], a, strong {
 	font-size: 2em !important;
 }
 
@@ -35,6 +34,7 @@ textarea {
 	width: calc(100% - 2em);
 	height: 200px;
 	font-family: monospace;
+	font-size: 2em;
 }
 
 li {
@@ -54,7 +54,8 @@ li {
 }
 
 .like {
-	background-color: red;
+	color: #02b3e4;
+	font-size: 1.5em;
 }
 
 .flex-container {
@@ -67,7 +68,7 @@ li {
 .flex-item {
 	background: tomato;
 	padding: 5px;
-	width: 30%;
+	width: 50%;
 	margin-top: 10px;
 	text-align: center;
 }

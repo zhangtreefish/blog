@@ -131,6 +131,28 @@ class Comment(ndb.Model):
         return cls.query(ancestor=post_key).order(-cls.postedAt).fetch()
 
 
+def verify_login(f):
+    def _wrapper(self, *args, **kw):
+        user = getattr(self, 'user')
+        if user is None:
+            message = """Only a logged in user can edit or delete own posts, like others'
+                    posts, or edit or delete own comments."""
+            self.redirect(webapp2.uri_for('login', message=message))
+        return f(self, *args, **kw)
+    return _wrapper
+
+
+def verify_post_key_st(f):
+    def _wrapper(self, *a, **kw):
+        post_key_st = kw['post_key_st']
+        post_key = ndb.Key(urlsafe=post_key_st)
+        if post_key is None:
+            message = 'No valid post key is present to permit display a post or a comment'
+            self.redirect(webapp2.uri_for('welcome', message=message))
+        return f(self, *a, **kw)
+    return _wrapper
+
+
 class BlogHandler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -201,7 +223,7 @@ class BlogHandler(webapp2.RequestHandler):
         self.redirect(webapp2.uri_for('login', message=message))
 
     def when_no_post_key(self):
-        message = 'Post key is required to display a post'
+        message = 'Post key is required to display a post or a comment'
         self.redirect(webapp2.uri_for('welcome', message=message))
 
     def go_to_post(self, post_key_st, message=''):
@@ -342,12 +364,11 @@ class LogOutHandler(BlogHandler):
 
 
 class NewPostHandler(BlogHandler):
+    @verify_login
     def get(self):
-        if self.user is None:
-            self.redirect('/login')
-        else:
-            self.render('new_post.html', author_id=self.user.key.id())
+        self.render('new_post.html', author_id=self.user.key.id())
 
+    @verify_login
     def post(self):
         author = self.user
         subject = self.request.get('subject') or None
@@ -384,43 +405,44 @@ class NewPostHandler(BlogHandler):
 
 
 class PostPermalinkHandler(BlogHandler):
+    # @verify_post_key_st
     def get(self, post_key_st):
-        if self.user is None:
-            self.redirect('/login')
-        else:
-            try:
-                if post_key_st:
-                    message = self.request.get('message')
-                    post_key = ndb.Key(urlsafe=post_key_st)
-                    post = post_key.get()
-                    comments = Comment.query_comments(post_key)
-                    self.render('post_permalink.html',
-                                message=message,
-                                author=post.author,
-                                subject=post.subject,
-                                content=post.content,
-                                postedAt=post.postedAt,
-                                likes=len(post.liked_by),
-                                post_key_st=post_key_st,
-                                comments=comments)
-                else:
-                    self.when_no_post_key()
-            except BadArgumentError as err:
-                print("BadArgumentError: {0}".format(err))
-            except Error as err:
-                print("Error: {0}".format(err))
+        try:
+            post_key = ndb.Key(urlsafe=post_key_st)
+            if post_key:
+                message = self.request.get('message')
+                post = post_key.get()
+                comments = Comment.query_comments(post_key)
+                self.render('post_permalink.html',
+                            message=message,
+                            author=post.author,
+                            subject=post.subject,
+                            content=post.content,
+                            postedAt=post.postedAt,
+                            likes=len(post.liked_by),
+                            post_key_st=post_key_st,
+                            comments=comments)
+            else:
+                self.when_no_post_key()
+        except BadArgumentError as err:
+            print("BadArgumentError: {0}".format(err))
+        except Error as err:
+            print("Error: {0}".format(err))
 
 
 class NewCommentHandler(BlogHandler):
+    @verify_login
     def get(self, post_key_st):
-        if self.user:
+        if post_key_st:
             post_key = ndb.Key(urlsafe=post_key_st)
             self.render('new_comment.html',
                         post_key_st=post_key_st,
                         post_id=post_key.id())
         else:
-            self.when_not_authorized()
+            self.when_no_post_key()
 
+
+    @verify_login
     def post(self, post_key_st):
         commenter = self.user
         if commenter:
@@ -444,9 +466,10 @@ class NewCommentHandler(BlogHandler):
 
 
 class EditCommentHandler(BlogHandler):
+    @verify_login
     def post(self, post_key_st, comment_key_st):
         try:
-            if self.user:
+            if post_key_st and comment_key_st:
                 comment_key = ndb.Key(urlsafe=comment_key_st)
                 comment = comment_key.get()
                 editor_name = self.user.username
@@ -460,12 +483,13 @@ class EditCommentHandler(BlogHandler):
                     message = "Can not edit others' comment"
                 self.go_to_post(post_key_st, message)
             else:
-                self.when_not_authorized()
+                self.when_no_post_key()
         except Error as err:
             print("Error: {0}".format(err))
 
 
 class DeleteCommentHandler(BlogHandler):
+    @verify_login
     def post(self, post_key_st):
         try:
             if self.user:

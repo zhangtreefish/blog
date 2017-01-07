@@ -55,3 +55,4 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 16. [http://pep8online.com]<br />
 17. [jinja macro](http://stackoverflow.com/questions/9404990/how-to-pass-selected-named-arguments-to-jinja2s-include-context)
 18. [set unique modal ids](http://stackoverflow.com/questions/40937631/modals-created-in-jinja-conditional-statement-are-all-showing-the-same-data)
+19. [ProtocolBufferDecodeError](http://stackoverflow.com/questions/20731851/how-to-properly-handle-wrong-urlsafe-key-provided)

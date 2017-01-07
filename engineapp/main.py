@@ -27,6 +27,7 @@ import random
 import string
 import hashlib
 from google.appengine.ext.db import Error, BadArgumentError
+from google.net.proto.ProtocolBuffer import ProtocolBufferDecodeError
 
 
 # Implement the hashing of user_id to be used in cookie
@@ -407,27 +408,25 @@ class NewPostHandler(BlogHandler):
 class PostPermalinkHandler(BlogHandler):
     # @verify_post_key_st
     def get(self, post_key_st):
+        post = None
         try:
             post_key = ndb.Key(urlsafe=post_key_st)
-            if post_key:
-                message = self.request.get('message')
-                post = post_key.get()
-                comments = Comment.query_comments(post_key)
-                self.render('post_permalink.html',
-                            message=message,
-                            author=post.author,
-                            subject=post.subject,
-                            content=post.content,
-                            postedAt=post.postedAt,
-                            likes=len(post.liked_by),
-                            post_key_st=post_key_st,
-                            comments=comments)
-            else:
-                self.when_no_post_key()
-        except BadArgumentError as err:
-            print("BadArgumentError: {0}".format(err))
-        except Error as err:
-            print("Error: {0}".format(err))
+            post = post_key.get()
+        except ProtocolBufferDecodeError as err:
+            message = "ProtocolBufferDecodeError: {0}".format(err)
+            self.when_no_post_key()
+        if post:
+            message = self.request.get('message')
+            comments = Comment.query_comments(post_key)
+            self.render('post_permalink.html',
+                        message=message,
+                        author=post.author,
+                        subject=post.subject,
+                        content=post.content,
+                        postedAt=post.postedAt,
+                        likes=len(post.liked_by),
+                        post_key_st=post_key_st,
+                        comments=comments)
 
 
 class NewCommentHandler(BlogHandler):

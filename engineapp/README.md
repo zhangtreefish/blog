@@ -56,3 +56,5 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 17. [jinja macro](http://stackoverflow.com/questions/9404990/how-to-pass-selected-named-arguments-to-jinja2s-include-context)
 18. [set unique modal ids](http://stackoverflow.com/questions/40937631/modals-created-in-jinja-conditional-statement-are-all-showing-the-same-data)
 19. [ProtocolBufferDecodeError](http://stackoverflow.com/questions/20731851/how-to-properly-handle-wrong-urlsafe-key-provided)
+20. [decorator for webapp2](https://discussions.udacity.com/t/final-project-trouble-separating-handlers-and-classes-into-their-own-packages/188462/5)
+21. [*args and **kwargs in decorators](http://stackoverflow.com/questions/1965607/how-can-i-pass-a-variable-in-a-decorator-to-functions-argument-in-a-decorated-f)

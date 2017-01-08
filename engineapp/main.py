@@ -133,23 +133,27 @@ class Comment(ndb.Model):
 
 
 def verify_login(f):
-    def _wrapper(self, *args, **kw):
+    '''this is a decorator checking the logged in status of the user'''
+    def _wrapper(self, *a, **kw):
         user = getattr(self, 'user')
         if user is None:
             message = """Only a logged in user can edit or delete own posts, like others'
                     posts, or edit or delete own comments."""
             self.redirect(webapp2.uri_for('login', message=message))
-        return f(self, *args, **kw)
+        return f(self, *a, **kw)
     return _wrapper
 
 
-def verify_post_key_st(f):
+def validate_post_key(f):
+    '''this is a decorator checking the validity of post_key_st'''
     def _wrapper(self, *a, **kw):
-        post_key_st = kw['post_key_st']
-        post_key = ndb.Key(urlsafe=post_key_st)
-        if post_key is None:
-            message = 'No valid post key is present to permit display a post or a comment'
-            self.redirect(webapp2.uri_for('welcome', message=message))
+        try:
+            post_key_st = kw['post_key_st']
+            post_key = ndb.Key(urlsafe=post_key_st)
+            post = post_key.get()
+        except:  # catch all
+            post = None
+        kw['post'] = post
         return f(self, *a, **kw)
     return _wrapper
 
@@ -223,8 +227,7 @@ class BlogHandler(webapp2.RequestHandler):
         posts, or edit or delete own comments."""
         self.redirect(webapp2.uri_for('login', message=message))
 
-    def when_no_post_key(self):
-        message = 'Post key is required to display a post or a comment'
+    def when_no_post_key(self, message=''):
         self.redirect(webapp2.uri_for('welcome', message=message))
 
     def go_to_post(self, post_key_st, message=''):
@@ -233,6 +236,18 @@ class BlogHandler(webapp2.RequestHandler):
             webapp2.uri_for('postpermalink',
                             post_key_st=post_key_st, message=message)
         )
+
+    # def verified_post(self, post_key_st):
+    #     try:
+    #         post_key = ndb.Key(urlsafe=post_key_st)
+    #         post = post_key.get()
+    #     except (ProtocolBufferDecodeError, TypeError) as err:
+    #         self.write("ProtocolBufferDecodeError or TypeError {0}".format(err))
+    #         self.write('Post key is required to display a post or a comment')
+    #         post = None
+    #     except:  # catch all
+    #         post = None
+    #     return post
 
 
 class WelcomeHandler(BlogHandler):
@@ -406,18 +421,12 @@ class NewPostHandler(BlogHandler):
 
 
 class PostPermalinkHandler(BlogHandler):
-    # @verify_post_key_st
-    def get(self, post_key_st):
-        post = None
-        try:
-            post_key = ndb.Key(urlsafe=post_key_st)
-            post = post_key.get()
-        except ProtocolBufferDecodeError as err:
-            message = "ProtocolBufferDecodeError: {0}".format(err)
-            self.when_no_post_key()
+    @validate_post_key
+    def get(self, post_key_st, **kw):
+        post = kw['post']
         if post:
             message = self.request.get('message')
-            comments = Comment.query_comments(post_key)
+            comments = Comment.query_comments(post.key)
             self.render('post_permalink.html',
                         message=message,
                         author=post.author,
@@ -427,48 +436,50 @@ class PostPermalinkHandler(BlogHandler):
                         likes=len(post.liked_by),
                         post_key_st=post_key_st,
                         comments=comments)
+        else:
+            self.when_no_post_key('No such post exists.')
 
 
 class NewCommentHandler(BlogHandler):
     @verify_login
-    def get(self, post_key_st):
-        if post_key_st:
-            post_key = ndb.Key(urlsafe=post_key_st)
+    @validate_post_key
+    def get(self, post_key_st, **kw):
+        post = kw['post']
+        if post:
             self.render('new_comment.html',
                         post_key_st=post_key_st,
-                        post_id=post_key.id())
+                        post_id=post.key.id())
         else:
-            self.when_no_post_key()
+            self.when_no_post_key('No such post exists.')
 
 
     @verify_login
-    def post(self, post_key_st):
-        commenter = self.user
-        if commenter:
-            if post_key_st:
-                post_key = ndb.Key(urlsafe=post_key_st)
-                comment = self.request.get('newcomment')
-                comment_id = ndb.Model.allocate_ids(size=1)[0]
-                comment_key = ndb.Key('Comment', comment_id, parent=post_key)
-                new_comment = Comment(
-                    id=comment_id,
-                    comment=comment,
-                    commenter=commenter.username,
-                    comment_key_st=comment_key.urlsafe(),
-                    parent=post_key)
-                new_comment.put()
-                self.go_to_post(post_key_st)
-            else:
-                self.when_no_post_key()
+    @validate_post_key
+    def post(self, post_key_st, **kw):
+        post = kw['post']
+        if post:
+            comment = self.request.get('newcomment')
+            comment_id = ndb.Model.allocate_ids(size=1)[0]
+            comment_key = ndb.Key('Comment', comment_id, parent=post.key)
+            new_comment = Comment(
+                id=comment_id,
+                comment=comment,
+                commenter=self.user.username,
+                comment_key_st=comment_key.urlsafe(),
+                parent=post.key)
+            new_comment.put()
+            self.go_to_post(post_key_st)
         else:
-            self.when_not_authorized()
+            self.when_no_post_key('No such post available for comment.')
 
 
 class EditCommentHandler(BlogHandler):
     @verify_login
-    def post(self, post_key_st, comment_key_st):
+    @validate_post_key
+    def post(self, post_key_st, comment_key_st, **kw):
         try:
-            if post_key_st and comment_key_st:
+            post = kw['post']
+            if post and comment_key_st:
                 comment_key = ndb.Key(urlsafe=comment_key_st)
                 comment = comment_key.get()
                 editor_name = self.user.username
@@ -482,16 +493,18 @@ class EditCommentHandler(BlogHandler):
                     message = "Can not edit others' comment"
                 self.go_to_post(post_key_st, message)
             else:
-                self.when_no_post_key()
+                self.when_no_post_key('No such post or comment available')
         except Error as err:
             print("Error: {0}".format(err))
 
 
 class DeleteCommentHandler(BlogHandler):
     @verify_login
-    def post(self, post_key_st):
+    @validate_post_key
+    def post(self, post_key_st, **kw):
         try:
-            if self.user:
+            post = kw['post']
+            if post:
                 deleter_name = self.user.username
                 comment_key_st = self.request.get('comment_key_st')
                 comment_key = ndb.Key(urlsafe=comment_key_st)
@@ -505,48 +518,50 @@ class DeleteCommentHandler(BlogHandler):
                     message = "Can not delete others' comment"
                 self.go_to_post(post_key_st, message)
             else:
-                self.when_not_authorized()
+                self.when_no_post_key('No such post with comment to be deleted')
         except Error as err:
             print("Error: {0}".format(err))
 
 
 class EditPostHandler(BlogHandler):
-    def get(self, post_key_st):
+    @verify_login
+    @validate_post_key
+    def get(self, post_key_st, **kw):
         try:
-            if self.user:
-                post_key = ndb.Key(urlsafe=post_key_st)
+            post = kw['post']
+            if post:
                 editor_name = self.user.username
-                author_key = post_key.parent()
+                author_key = post.key.parent()
                 author = author_key.get()
                 message = ''
-                comments = Comment.query_comments(post_key)
+                comments = Comment.query_comments(post.key)
                 if len(comments) != 0:
                     self.when_commented(post_key_st)
                 elif editor_name != author.username:
                     message = 'Can only edit own post'
                     self.go_to_post(post_key_st, message)
                 else:
-                    post = post_key.get()
                     self.render('post_edit.html',
                                 post_key_st=post_key_st,
                                 subject=post.subject,
                                 content=post.content)
             else:
-                self.when_not_authorized()
+                self.when_no_post_key('No such post')
         except Error as err:
             print("Error: {0}".format(err))
 
-    def post(self, post_key_st):
+    @verify_login
+    @validate_post_key
+    def post(self, post_key_st, **kw):
         try:
-            if self.user:
-                post_key = ndb.Key(urlsafe=post_key_st)
+            post = kw['post']
+            if post:
                 editor_name = self.user.username
-                author_key = post_key.parent()
+                author_key = post.key.parent()
                 author = author_key.get()
-                comments = Comment.query_comments(post_key)
+                comments = Comment.query_comments(post.key)
                 message = ''
                 if len(comments) == 0 and editor_name == author.username:
-                    post = post_key.get()
                     post.subject = self.request.get('subject')
                     post.content = self.request.get('content')
                     post.put()
@@ -556,7 +571,7 @@ class EditPostHandler(BlogHandler):
                     is already commented or that you did not author the post'''
                 self.go_to_post(post_key_st, message)
             else:
-                self.when_not_authorized()
+                self.when_no_post_key('No such post to be edited')
         except Error as err:
             print("Error: {0}".format(err))
 
@@ -566,57 +581,40 @@ class EditPostHandler(BlogHandler):
 
 
 class LikePostHandler(BlogHandler):
-    def post(self, post_key_st):
+    @verify_login
+    @validate_post_key
+    def post(self, post_key_st, **kw):
         if self.user:
-            liker_name = self.user.username
-            post_key = ndb.Key(urlsafe=post_key_st)
-            author_key = post_key.parent()
-            author = author_key.get()
-            message = ''
-            # can only like others' post
-            if liker_name != author.username:
-                post = post_key.get()
-                # can only like a post once
-                if liker_name in post.liked_by:
-                    message = 'You have given your one like'
+            post = kw['post']
+            if post:
+                liker_name = self.user.username
+                author_key = post.key.parent()
+                author = author_key.get()
+                message = ''
+                # can only like others' post
+                if liker_name != author.username:
+                    # can only like a post once
+                    if liker_name in post.liked_by:
+                        message = 'You have given your one like'
+                    else:
+                        post.liked_by.append(liker_name)
+                        post.put()
+                        message = 'Thank you for liking!'
                 else:
-                    post.liked_by.append(liker_name)
-                    post.put()
-                    message = 'Thank you for liking!'
+                    message = 'Can not like own post'
+                self.go_to_post(post_key_st, message)
             else:
-                message = 'Can not like own post'
-            self.go_to_post(post_key_st, message)
+                self.when_no_post_key('No such post to be liked')
         else:
             self.when_not_authorized()
 
 
 class DeletePostHandler(BlogHandler):
+    @verify_login
     def get(self):
         if self.user:
             post_key_st = self.request.get('post_key_st')
-            post_key = ndb.Key(urlsafe=post_key_st)
-            deleter_name = self.user.username
-            author_key = post_key.parent()
-            author = author_key.get()
-            comments = Comment.query_comments(post_key)
-            message = ''
-            if len(comments) == 0 and deleter_name == author.username:
-                post = post_key.get()
-                self.render(
-                    'post_delete.html',
-                    username=deleter_name,
-                    subject=post.subject,
-                    post_key_st=post_key_st
-                )
-            else:
-                self.can_not_delete(post_key_st)
-        else:
-            self.when_not_authorized()
-
-    def post(self):
-        try:
-            if self.user:
-                post_key_st = self.request.get('post_key_st')
+            if post_key_st:
                 post_key = ndb.Key(urlsafe=post_key_st)
                 deleter_name = self.user.username
                 author_key = post_key.parent()
@@ -625,10 +623,39 @@ class DeletePostHandler(BlogHandler):
                 message = ''
                 if len(comments) == 0 and deleter_name == author.username:
                     post = post_key.get()
-                    post.key.delete()
-                    self.redirect('/welcome')
+                    self.render(
+                        'post_delete.html',
+                        username=deleter_name,
+                        subject=post.subject,
+                        post_key_st=post_key_st
+                    )
                 else:
                     self.can_not_delete(post_key_st)
+            else:
+                self.when_no_post_key('No such post to be deleted')
+        else:
+            self.when_not_authorized()
+
+    @verify_login
+    def post(self):
+        try:
+            if self.user:
+                post_key_st = self.request.get('post_key_st')
+                if post_key_st:
+                    post_key = ndb.Key(urlsafe=post_key_st)
+                    deleter_name = self.user.username
+                    author_key = post_key.parent()
+                    author = author_key.get()
+                    comments = Comment.query_comments(post_key)
+                    message = ''
+                    if len(comments) == 0 and deleter_name == author.username:
+                        post = post_key.get()
+                        post.key.delete()
+                        self.redirect('/welcome')
+                    else:
+                        self.can_not_delete(post_key_st)
+                else:
+                    self.when_no_post_key('No such post to be deleted')
             else:
                 self.when_not_authorized()
         except Error as err:

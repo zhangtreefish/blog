@@ -58,3 +58,5 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 19. [ProtocolBufferDecodeError](http://stackoverflow.com/questions/20731851/how-to-properly-handle-wrong-urlsafe-key-provided)
 20. [decorator for webapp2](https://discussions.udacity.com/t/final-project-trouble-separating-handlers-and-classes-into-their-own-packages/188462/5)
 21. [*args and **kwargs in decorators](http://stackoverflow.com/questions/1965607/how-can-i-pass-a-variable-in-a-decorator-to-functions-argument-in-a-decorated-f)
+22. [Modeling Entity Relationships](https://cloud.google.com/appengine/articles/modeling#one-to-many)
+23. [Use http verb delete-not other verbs-for delete](http://www.drdobbs.com/web-development/restful-web-services-a-tutorial/240169069?pgno=2)

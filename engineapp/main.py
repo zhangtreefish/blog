@@ -134,19 +134,20 @@ class Comment(ndb.Model):
 
 def verify_login(f):
     '''this is a decorator checking the logged in status of the user'''
-    def _wrapper(self, *a, **kw):
+    def _wrapper(*a, **kw):
+        self = a[0]
         user = getattr(self, 'user')
         if user is None:
             message = """Only a logged in user can edit or delete own posts, like others'
                     posts, or edit or delete own comments."""
             self.redirect(webapp2.uri_for('login', message=message))
-        return f(self, *a, **kw)
+        return f(*a, **kw)
     return _wrapper
 
 
 def validate_post_key(f):
     '''this is a decorator checking the validity of post_key_st'''
-    def _wrapper(self, *a, **kw):
+    def _wrapper(*a, **kw):
         try:
             post_key_st = kw['post_key_st']
             post_key = ndb.Key(urlsafe=post_key_st)
@@ -154,7 +155,7 @@ def validate_post_key(f):
         except:  # catch all
             post = None
         kw['post'] = post
-        return f(self, *a, **kw)
+        return f(*a, **kw)
     return _wrapper
 
 

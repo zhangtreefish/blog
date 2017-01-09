@@ -8,10 +8,11 @@ class WelcomeHandler(bloghandler.BlogHandler):
         posts = ''
         # if logged in, show user's own posts
         if self.user:
-            posts=models.BlogPost.query_post(self.user.key)
+            posts = models.BlogPost.query_post(self.user.key)
         # otherwise show 10 most recent posts by all users
         else:
-            posts = models.BlogPost.query().order(-models.BlogPost.postedAt).fetch(10)
+            posts = models.BlogPost.query().order(
+                -models.BlogPost.postedAt).fetch(10)
         message = self.request.get('message')
         self.render(
             'welcome.html',

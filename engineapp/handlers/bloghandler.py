@@ -4,12 +4,12 @@ import jinja2
 from google.appengine.ext import ndb
 from google.appengine.ext.db import Error, BadArgumentError
 from google.net.proto.ProtocolBuffer import ProtocolBufferDecodeError
-from utils import hash_str, make_secure_val, check_secure_val
-from utils import make_salt, make_pw_hash, valid_pw
-from models import User, BlogPost, Comment
+from handlers.utils import hash_str, make_secure_val, check_secure_val
+from handlers.utils import make_salt, make_pw_hash, valid_pw
+from models.models import User, BlogPost, Comment
 
 
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+template_dir = os.path.join(os.path.dirname(__file__), '../templates')
 # jinja2.6 deos not support lstrip_blocks
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                trim_blocks=True,

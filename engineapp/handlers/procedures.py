@@ -1,6 +1,6 @@
-import models
-import bloghandler
-from utils import valid_password, valid_pw, valid_email
+import models.models as models
+import handlers.bloghandler as bloghandler
+from handlers.utils import valid_username, valid_password, valid_pw, valid_email
 
 
 class UsersHandler(bloghandler.BlogHandler):

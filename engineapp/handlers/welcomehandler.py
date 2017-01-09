@@ -1,5 +1,5 @@
-import models
-import bloghandler
+import models.models as models
+import handlers.bloghandler as bloghandler
 import google.appengine.ext.db as db
 
 

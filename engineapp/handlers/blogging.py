@@ -1,6 +1,6 @@
-from models import User, BlogPost, Comment
-from bloghandler import BlogHandler
-from utils import verify_login, validate_post_key
+from models.models import User, BlogPost, Comment
+from handlers.bloghandler import BlogHandler
+from handlers.utils import verify_login, validate_post_key
 from google.appengine.ext import ndb
 from google.appengine.ext.db import Error
 

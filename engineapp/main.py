@@ -1,7 +1,7 @@
 import webapp2
-import welcomehandler
-import procedures
-import blogging
+import handlers.welcomehandler as welcomehandler
+import handlers.procedures as procedures
+import handlers.blogging as blogging
 
 
 # Remove debug=True before final deployment

@@ -2,7 +2,8 @@
 ### Explore my app at [here](http://gaejinjablog.appspot.com)
 {baseUrl} = http://gaejinjablog.appspot.com from here on.
 ## Features:
---Front page that lists recent blog posts: {baseUrl}/welcome<br />
+--Front page that lists 10 recent blog posts for all visitors and own posts
+  for logged-in user: {baseUrl}/welcome or {baseUrl}<br />
 --A form to submit new entries: {baseUrl}/newpost<br />
 --Blog posts have their own page: {baseUrl}/post/<post_id>.<br />
 --A post can be modified by its author: {baseUrl}/deletepost, or
@@ -33,7 +34,7 @@
 * To run the app with fresh data:`dev_appserver.py . --clear_datastore true`
 * To deploy: create a project at Google Cloud Platform, asign
   yourself a role in the project at IAM/Admin tab. To deploy run
- `gcloud app deploy`
+ `gcloud app deploy --project <proj-name> -v <version-number>`
 
 ## References
 1 [webapp2 Building URIs](https://webapp2.readthedocs.io/en/latest/guide/routing.html#guide-routing-building-uris)<br />

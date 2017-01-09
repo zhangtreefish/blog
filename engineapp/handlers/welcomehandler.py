@@ -21,7 +21,5 @@ class WelcomeHandler(bloghandler.BlogHandler):
             self.render(
                 'welcome.html',
                 message=message,
-                user_id=self.user.key.id() if self.user else None,
-                username=self.user.username if self.user else None,
                 posts=all_posts
             )

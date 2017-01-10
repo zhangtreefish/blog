@@ -61,3 +61,4 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 21. [*args and **kwargs in decorators](http://stackoverflow.com/questions/1965607/how-can-i-pass-a-variable-in-a-decorator-to-functions-argument-in-a-decorated-f)
 22. [Modeling Entity Relationships](https://cloud.google.com/appengine/articles/modeling#one-to-many)
 23. [Use http verb delete-not other verbs-for delete](http://www.drdobbs.com/web-development/restful-web-services-a-tutorial/240169069?pgno=2)
+24. [create-index to solve the missing index error in deployment](http://stackoverflow.com/questions/37077734/app-engine-needindexerror-no-matching-index-found)

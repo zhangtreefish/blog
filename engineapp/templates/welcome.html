@@ -7,8 +7,8 @@
 		</div>
 	{% endif %}
 	{% if user_id %}
-		<h2>Welcome {{user_id}} {{username}}! </h2>
-		<a class="btn btn-info btn-lg" href={{"/newpost"}}> New Post </a>
+		<h2>欢迎您 {{username}}! </h2>
+		<a class="btn btn-info btn-lg" href={{"/newpost"}}> 新发表 </a>
 	{% endif %}
 	{% if posts %}
 		<h2> All Posts </h2>
@@ -16,14 +16,14 @@
 			<ol>
 			{% for post in posts %}
 				<li>
-					<a class="btn btn-link btn-lg" href={{"/post/{}".format(post.key.urlsafe())}}> Post Link <i class="fa fa-link" aria-hidden="true"></i></a>
+					<a class="btn btn-link btn-lg" href={{"/post/{}".format(post.key.urlsafe())}}> 发表详情衔接 <i class="fa fa-link" aria-hidden="true"></i></a>
 					<strong> author: {{post.author}}</strong>
 					<strong>subject:{{post.subject}}</strong>
 					<span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
 					<textarea>{{post.content}}</textarea>
 					<em> {{post.liked_by|length}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
 					<form action="/post/{{post.key.urlsafe()}}/like" method="POST">
-						<input class="btn btn-success" type="submit" value="like">
+						<input class="btn btn-success" type="submit" value="喜欢">
 					</form>
 				</li>
 			{% endfor %}

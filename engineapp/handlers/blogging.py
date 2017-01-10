@@ -85,16 +85,19 @@ class NewCommentHandler(BlogHandler):
         post = kw['post']
         if post:
             comment = self.request.get('newcomment')
-            comment_id = ndb.Model.allocate_ids(size=1)[0]
-            comment_key = ndb.Key('Comment', comment_id, parent=post.key)
-            new_comment = Comment(
-                id=comment_id,
-                comment=comment,
-                commenter=self.user.username,
-                comment_key_st=comment_key.urlsafe(),
-                parent=post.key)
-            new_comment.put()
-            self.go_to_post(post_key_st)
+            if comment:
+                comment_id = ndb.Model.allocate_ids(size=1)[0]
+                comment_key = ndb.Key('Comment', comment_id, parent=post.key)
+                new_comment = Comment(
+                    id=comment_id,
+                    comment=comment,
+                    commenter=self.user.username,
+                    comment_key_st=comment_key.urlsafe(),
+                    parent=post.key)
+                new_comment.put()
+                self.go_to_post(post_key_st, 'Thanks for the comment!')
+            else:
+                self.go_to_post(post_key_st, 'No blank content is permitted.')
         else:
             self.when_no_post_key('No such post available for comment.')
 

@@ -11,15 +11,15 @@
 		<a class="btn btn-info btn-lg" href={{"/newpost"}}> 新发表 </a>
 	{% endif %}
 	{% if posts %}
-		<h2> All Posts </h2>
+		<h2> 最新发表 </h2>
 		<div>
 			<ol>
 			{% for post in posts %}
 				<li>
 					<a class="btn btn-link btn-lg" href={{"/post/{}".format(post.key.urlsafe())}}> 发表详情衔接 <i class="fa fa-link" aria-hidden="true"></i></a>
-					<strong> author: {{post.author}}</strong>
-					<strong>subject:{{post.subject}}</strong>
-					<span> on {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+					<strong> 作者: {{post.author}}</strong>
+					<strong>标题:{{post.subject}}</strong>
+					<span> 时间 {{post.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
 					<textarea>{{post.content}}</textarea>
 					<em> {{post.liked_by|length}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
 					<form action="/post/{{post.key.urlsafe()}}/like" method="POST">

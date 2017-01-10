@@ -1,6 +1,6 @@
 # A Simple Blog App Built with Google App Engine
-### Explore my app at [here](http://gaejinjablog.appspot.com)
-{baseUrl} = http://gaejinjablog.appspot.com from here on.
+### Explore my app at [here](https://3-dot-default-dot-gaejinjablog.appspot.com/), or [here](https://gaejinjablog.appspot.com/) for the version with Chinese UI.
+{baseUrl} = https://gaejinjablog.appspot.com from here on.
 ## Features:
 --Front page that lists 10 recent blog posts for all visitors and own posts
   for logged-in user: {baseUrl}/welcome or {baseUrl}<br />
@@ -62,3 +62,4 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 22. [Modeling Entity Relationships](https://cloud.google.com/appengine/articles/modeling#one-to-many)
 23. [Use http verb delete-not other verbs-for delete](http://www.drdobbs.com/web-development/restful-web-services-a-tutorial/240169069?pgno=2)
 24. [create-index to solve the missing index error in deployment](http://stackoverflow.com/questions/37077734/app-engine-needindexerror-no-matching-index-found)
+25. [splitting traffic: How Requests are Routed](https://cloud.google.com/appengine/docs/python/how-requests-are-routed)

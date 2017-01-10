@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 	<form method="POST">
-		<label>Name
+		<label>名字
 			<input type="text" name="username" value="{{username}}">
 		</label>
 		<span style="color: red">{{username_err_required}}</span>
 		<span style="color: red">{{username_err_nonvalid}}</span>
 		<span style="color: red">{{username_err_unique}}</span>
 		<br>
-		<label>Password
+		<label>密码
 			<input type="password" name="password" value="">
 		</label>
 		<span style="color: red">{{password_err}}</span>
 		<br>
-		<label>Verify Password
+		<label>确证密码
 			<input type="password" name="verify" value="">
 		</label>
 		<span style="color: red">{{verify_err}}</span>
 		<br>
-		<label>Email
+		<label>电子邮件
 			<input type="email" name="email" value="{{email}}">
 		</label>
 		<span style="color: red">{{email_err}}</span>

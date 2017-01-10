@@ -3,10 +3,10 @@
 	{% if post_key_st %}
 		<main>
 			<form method="POST">
-				<label>Subject
+				<label>标题
 					<input type="text" name="subject" value="{{subject}}">
 				</label>
-				<label>Content
+				<label>内容
 					<textarea type="text" name="content">{{content}}</textarea>
 				</label>
 				<input type="submit" class="btn btn-success btn-sm">
@@ -17,7 +17,7 @@
 	{% endif %}
 	{% if comments %}
 		<div>
-			<h2> All Comments </h2>
+			<h2> 所有评语 </h2>
 			<ol>
 			{% for c in comments %}
 				<li>

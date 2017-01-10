@@ -25,6 +25,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/post/<post_key_st>/like',
                   handler=blogging.LikePostHandler, name='likepost'),
     webapp2.Route(r'/deletepost',
-                  handler=blogging.DeletePostHandler, name='deletepost'),
-    webapp2.Route(r'/users', handler=procedures.UsersHandler, name='users')
+                  handler=blogging.DeletePostHandler, name='deletepost')
 ], debug=True)

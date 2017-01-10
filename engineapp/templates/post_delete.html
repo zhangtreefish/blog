@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-	<h2> You are sure you want to delete post titled '{{subject}}', {{username}}? </h2>
+	<h2> {{username}}，您真想删除标题为‘{{subject}}’的发表条吗？</h2>
 	<form action="/deletepost?post_key_st={{post_key_st}}" method="POST">
-		<input class="btn btn-danger btn-sm" type="submit" value='Yes, delete it'>
+		<input class="btn btn-danger btn-sm" type="submit" value='是的，请删除'>
 		<a href={{"/post/{}".format(post_key_st)}} class="btn btn-primary btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>Cancel</a>
 	</form>
 {% endblock %}

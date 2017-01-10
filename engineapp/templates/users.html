@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 	{% if users %}
-		<div> Users List
+		<div> 用户名册
 			<ol>
 				{% for user in users %}
 					<li>
 						<strong>{{user.id}}{{user.username}}</strong>
-						<span> last on {{user.lastLoggedIn.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+						<span> 最近登录 {{user.lastLoggedIn.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
 					</li>
 				{% endfor %}
 			</ol>

@@ -9,28 +9,28 @@
 			</div>
 		{% endif %}
 		<main>
-			<h2> Details of Post </h2>
-			<span>author: {{author}}</span>
-			<span>subject: {{subject}}</span>
-			<textarea>content: {{content}}</textarea>
-			<span>Posted at {{postedAt.strftime("%b %d, %Y")}}.</span>
+			<h2> 发表条详情 </h2>
+			<span>作者: {{author}}</span>
+			<span>标题: {{subject}}</span>
+			<textarea>内容: {{content}}</textarea>
+			<span>发表于 {{postedAt.strftime("%b %d, %Y")}}.</span>
 			<em class='like'>{{likes}} <i class="fa fa-2x fa-thumbs-up" aria-hidden="true"></i> </em>
 		</main>
 		{{btns(post_key_st)}}
 	{% endif %}
 	{% if comments %}
 		<div>
-			<h2> All Comments </h2>
+			<h2> 所有评语 </h2>
 			<ol>
 			{% for c in comments %}
 				<li>
-					<strong> by {{c.commenter}}</strong>
-					<span> on {{c.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
+					<strong> 点评人 {{c.commenter}}</strong>
+					<span> 点评时间 {{c.postedAt.strftime("%b %d, %Y at %H: %M: %S:")}}</span>
 					<textarea>{{c.comment}}</textarea>
 					<div class='flex-container'>
 						<!-- Edit Button trigger -->
 						<button class="btn btn-primary btn-lg flex_item" data-toggle="modal" data-target="#editModal_{{c.comment_key_st}}">
-							Edit
+							编辑
 						</button>
 						<!-- Edit Button Modal -->
 						<div class="modal fade" id="editModal_{{c.comment_key_st}}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
@@ -54,7 +54,7 @@
 						</div><!-- /.modal -->
 						<!-- Delete Button -->
 						<form class='flex_item' action="/post/{{post_key_st}}/deletecomment?comment_key_st={{c.comment_key_st}}" method="POST">
-							<input type="submit" value='Delete' class="btn btn-warning btn-lg">
+							<input type="submit" value='删除' class="btn btn-warning btn-lg">
 						</form>
 					</div>
 				</li>
@@ -63,7 +63,7 @@
 		</div>
 	{% endif %}
 	{% if not post_key_st %}
-		<h2> No post available without post_key_st </h2>
+		<h2> 此发表条不存在 </h2>
 	{% endif %}
 {% endblock %}
 

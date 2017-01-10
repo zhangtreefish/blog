@@ -3,11 +3,11 @@
 	{% if post_key_st %}
 		<aside>
 			<form method="POST">
-				<label>Comment for post {{post_id}}
+				<label> ‘{{post_id}}’ 的评语
 					<textarea type="text" name="newcomment">{{comment}}</textarea>
 				</label>
 				<br>
-				<input class="btn btn-success btn-lg" type="submit" value='post comment'>
+				<input class="btn btn-success btn-lg" type="submit" value='发表评语'>
 			</form>
 		</aside>
 	{% endif %}

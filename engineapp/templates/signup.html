@@ -2,7 +2,7 @@
 {% block content %}
 	<form method="POST">
 		<label for="usern">Name
-			<input id="usern" type="text" name="username" value="{{username}}">
+			<input id="usern" type="text" name="username" value="{{username}}" placeholder="Joe">
 		</label>
 		<span style="color: red">{{username_err_required}}</span>
 		<span style="color: red">{{username_err_nonvalid}}</span>
@@ -19,7 +19,7 @@
 		<span style="color: red">{{verify_err}}</span>
 		<br>
 		<label for="eml">Email
-			<input id="eml" type="email" name="email" value="{{email}}">
+			<input id="eml" type="email" name="email" value="{{email}}" placeholder="joeperson@somesite.something">
 		</label>
 		<span style="color: red">{{email_err}}</span>
 		<br>

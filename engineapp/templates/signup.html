@@ -2,7 +2,7 @@
 {% block content %}
 	<form method="POST">
 		<label for="usern">Name
-			<input id="usern" type="text" name="username" value="{{username}}" placeholder="Joe">
+			<input id="usern" type="text" name="username" value="{{username}}" placeholder="Joe" autofocus>
 		</label>
 		<span style="color: red">{{username_err_required}}</span>
 		<span style="color: red">{{username_err_nonvalid}}</span>

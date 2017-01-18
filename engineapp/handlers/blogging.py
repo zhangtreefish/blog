@@ -15,6 +15,7 @@ class NewPostHandler(BlogHandler):
         author = self.user
         subject = self.request.get('subject') or None
         content = self.request.get('content') or None
+        tag = self.request.get('tag') or None
 
         my_kw = {}
 
@@ -24,22 +25,27 @@ class NewPostHandler(BlogHandler):
             my_kw['subject_err'] = 'Subject is a required field for blogs'
         if content is None:
             my_kw['content_err'] = 'Content is a required field for blogs'
+        if tag is None:
+            my_kw['tag_err'] = 'Tag is a required field for blogs'
 
         if my_kw:
             my_kw['subject'] = subject
             my_kw['content'] = content
+            my_kw['tag'] = tag
             my_kw['author_id'] = author.key.id()
             self.render('new_post.html', **my_kw)
 
         else:
             my_kw['subject'] = subject
             my_kw['content'] = content
+            my_kw['tag'] = tag
             post_id = ndb.Model.allocate_ids(size=1)[0]
             post_key = ndb.Key('BlogPost', post_id, parent=author.key)
             new_post = BlogPost(
                 id=post_id,
                 subject=subject,
                 content=content,
+                tag=tag,
                 author=author.username,
                 parent=author.key)
             new_post.put()
@@ -59,6 +65,7 @@ class PostPermalinkHandler(BlogHandler):
                         subject=post.subject,
                         content=post.content,
                         postedAt=post.postedAt,
+                        tag=post.tag,
                         likes=len(post.liked_by),
                         post_key_st=post_key_st,
                         comments=comments)
@@ -173,7 +180,8 @@ class EditPostHandler(BlogHandler):
                     self.render('post_edit.html',
                                 post_key_st=post_key_st,
                                 subject=post.subject,
-                                content=post.content)
+                                content=post.content,
+                                tag=post.tag)
             else:
                 self.when_no_post_key('No such post')
         except Error as err:
@@ -193,6 +201,7 @@ class EditPostHandler(BlogHandler):
                 if len(comments) == 0 and editor_name == author.username:
                     post.subject = self.request.get('subject')
                     post.content = self.request.get('content')
+                    post.tag = self.request.get('tag')
                     post.put()
                     message = 'Post successfully edited!'
                 else:

@@ -26,6 +26,7 @@ class BlogPost(ndb.Model):
     postedAt = ndb.DateTimeProperty(auto_now_add=True)
     author = ndb.StringProperty(required=True)
     liked_by = ndb.StringProperty(repeated=True)
+    tags = ndb.StringProperty(repeated=True)
 
     @classmethod
     def query_post(cls, author_key):

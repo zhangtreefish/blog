@@ -63,3 +63,4 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 23. [use http verb delete-not other verbs-for delete](http://www.drdobbs.com/web-development/restful-web-services-a-tutorial/240169069?pgno=2)
 24. [create-index to solve the missing index error in deployment](http://stackoverflow.com/questions/37077734/app-engine-needindexerror-no-matching-index-found)
 25. [splitting traffic: How Requests are Routed](https://cloud.google.com/appengine/docs/python/how-requests-are-routed)
+26. [set version3 branch as master(http://stackoverflow.com/questions/2862590/how-to-replace-master-branch-in-git-entirely-from-another-branch)]

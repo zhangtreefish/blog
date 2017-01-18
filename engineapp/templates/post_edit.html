@@ -9,6 +9,15 @@
 				<label>内容
 					<textarea type="text" name="content">{{content}}</textarea>
 				</label>
+				<label> Tag: {{tag}}
+					<input list="tag" name="tag">
+					<datalist id="tag">
+						<option value="memoir"></option>
+						<option value="travel"></option>
+						<option value="novella"></option>
+						<option value="commentary"></option>
+					</datalist>
+				</label>
 				<input type="submit" class="btn btn-success btn-sm">
 				<a href={{"/post/{}".format(post_key_st)}} class="btn btn-primary btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>Cancel</a>
 			</form>

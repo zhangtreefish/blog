@@ -3,8 +3,8 @@
 	{% if post_key_st %}
 		<aside>
 			<form method="POST">
-				<label>Comment for post {{post_id}}
-					<textarea type="text" name="newcomment">{{comment}}</textarea>
+				<label for="newc" >Comment for post {{post_id}}
+					<textarea id="newc" type="text" name="newcomment">{{comment}}</textarea>
 				</label>
 				<br>
 				<input class="btn btn-success btn-lg" type="submit" value='post comment'>

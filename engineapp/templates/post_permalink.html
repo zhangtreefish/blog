@@ -44,8 +44,8 @@
 									</div>
 									<div class="modal-body">
 										<form action="/post/{{post_key_st}}/comment/{{c.comment_key_st}}/edit" method="POST">
-											<label>Comment
-												<textarea type="text" name="comment"> {{c.comment}}</textarea>
+											<label for="comment">Comment
+												<textarea id="comment" type="text" name="comment"> {{c.comment}}</textarea>
 											</label>
 											<input type="submit">
 										</form>

@@ -3,14 +3,14 @@
 	{% if post_key_st %}
 		<main>
 			<form method="POST">
-				<label>Subject
-					<input type="text" name="subject" value="{{subject}}">
+				<label for="subj">Subject
+					<input id="subj" type="text" name="subject" value="{{subject}}">
 				</label>
-				<label>Content
-					<textarea type="text" name="content">{{content}}</textarea>
+				<label for="cont">Content
+					<textarea id="cont" type="text" name="content">{{content}}</textarea>
 				</label>
-				<label> Tag: {{tag}}
-					<input list="tag" name="tag">
+				<label for="tag_input"> Tag: {{tag}}
+					<input id="tag_input" list="tag" name="tag">
 					<datalist id="tag">
 						<option value="memoir"></option>
 						<option value="travel"></option>

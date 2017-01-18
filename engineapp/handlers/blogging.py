@@ -7,11 +7,11 @@ from google.appengine.ext.db import Error
 
 class NewPostHandler(BlogHandler):
     @verify_login
-    def get(self):
+    def get(self, *a, **kw):
         self.render('new_post.html', author_id=self.user.key.id())
 
     @verify_login
-    def post(self):
+    def post(self, *a, **kw):
         author = self.user
         subject = self.request.get('subject') or None
         content = self.request.get('content') or None
@@ -20,7 +20,10 @@ class NewPostHandler(BlogHandler):
         my_kw = {}
 
         if author is None:
-            my_kw['author_err'] = 'Login is required in order to post'
+            message = """Only a logged in user can edit or delete own posts, like others'
+                    posts, or edit or delete own comments."""
+            self.redirect(webapp2.uri_for('login', message=message))
+
         if subject is None:
             my_kw['subject_err'] = 'Subject is a required field for blogs'
         if content is None:

@@ -54,13 +54,13 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 14. [include in jinja](http://jinja.pocoo.org/docs/dev/templates/#import)<br />
 15. [css validator](https://jigsaw.w3.org/css-validator/validator)<br />
 16. [http://pep8online.com]<br />
-17. [jinja macro](http://stackoverflow.com/questions/9404990/how-to-pass-selected-named-arguments-to-jinja2s-include-context)
-18. [set unique modal ids](http://stackoverflow.com/questions/40937631/modals-created-in-jinja-conditional-statement-are-all-showing-the-same-data)
-19. [ProtocolBufferDecodeError](http://stackoverflow.com/questions/20731851/how-to-properly-handle-wrong-urlsafe-key-provided)
-20. [decorator for webapp2](https://discussions.udacity.com/t/final-project-trouble-separating-handlers-and-classes-into-their-own-packages/188462/5)
-21. [*args and **kwargs in decorators](http://stackoverflow.com/questions/1965607/how-can-i-pass-a-variable-in-a-decorator-to-functions-argument-in-a-decorated-f)
-22. [Modeling Entity Relationships](https://cloud.google.com/appengine/articles/modeling#one-to-many)
-23. [use http verb delete-not other verbs-for delete](http://www.drdobbs.com/web-development/restful-web-services-a-tutorial/240169069?pgno=2)
-24. [create-index to solve the missing index error in deployment](http://stackoverflow.com/questions/37077734/app-engine-needindexerror-no-matching-index-found)
-25. [splitting traffic: How Requests are Routed](https://cloud.google.com/appengine/docs/python/how-requests-are-routed)
-26. [set version3 branch as master(http://stackoverflow.com/questions/2862590/how-to-replace-master-branch-in-git-entirely-from-another-branch)]
+17. [jinja macro](http://stackoverflow.com/questions/9404990/how-to-pass-selected-named-arguments-to-jinja2s-include-context)<br />
+18. [set unique modal ids](http://stackoverflow.com/questions/40937631/modals-created-in-jinja-conditional-statement-are-all-showing-the-same-data)<br />
+19. [ProtocolBufferDecodeError](http://stackoverflow.com/questions/20731851/how-to-properly-handle-wrong-urlsafe-key-provided)<br />
+20. [decorator for webapp2](https://discussions.udacity.com/t/final-project-trouble-separating-handlers-and-classes-into-their-own-packages/188462/5)<br />
+21. [*args and **kwargs in decorators](http://stackoverflow.com/questions/1965607/how-can-i-pass-a-variable-in-a-decorator-to-functions-argument-in-a-decorated-f)<br />
+22. [Modeling Entity Relationships](https://cloud.google.com/appengine/articles/modeling#one-to-many)<br />
+23. [use http verb delete-not other verbs-for delete](http://www.drdobbs.com/web-development/restful-web-services-a-tutorial/240169069?pgno=2)<br />
+24. [create-index to solve the missing index error in deployment](http://stackoverflow.com/questions/37077734/app-engine-needindexerror-no-matching-index-found)<br />
+25. [splitting traffic: How Requests are Routed](https://cloud.google.com/appengine/docs/python/how-requests-are-routed)<br />
+26. [set version3 branch as master](http://stackoverflow.com/questions/2862590/how-to-replace-master-branch-in-git-entirely-from-another-branch)

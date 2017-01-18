@@ -9,13 +9,13 @@
 	<h2> Log In </h2>
 	<form method="POST">
 		<label for="usern">Name
-			<input id="usern" type="text" name="username" value="{{username}}" autofocus>
+			<input id="usern" type="text" name="username" value="{{username}}" autofocus required>
 		</label>
 		<span style="color: red">{{username_err_required}}</span>
 		<span style="color: red">{{username_err_nonexistent}}</span>
 		<br>
 		<label for="pwd">Password
-			<input id="pwd" type="password" name="password" value="">
+			<input id="pwd" type="password" name="password" value="" required>
 		</label>
 		<span style="color: red">{{password_err}}</span>
 		<span style="color: red">{{login_err}}</span>

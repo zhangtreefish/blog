@@ -2,14 +2,14 @@
 {% block content %}
 	<form method="POST">
 		<label for="usern">Name
-			<input id="usern" type="text" name="username" value="{{username}}" placeholder="Joe" autofocus>
+			<input id="usern" type="text" name="username" value="{{username}}" placeholder="Joe" autofocus maxlength="20" title="user name" pattern="^[\w-]{3,20}$">
 		</label>
 		<span style="color: red">{{username_err_required}}</span>
 		<span style="color: red">{{username_err_nonvalid}}</span>
 		<span style="color: red">{{username_err_unique}}</span>
 		<br>
 		<label for="pwd">Password
-			<input id="pwd" type="password" name="password" value="">
+			<input id="pwd" type="password" name="password" value="" maxlength="20" title="password" pattern="^.{3,20}$">
 		</label>
 		<span style="color: red">{{password_err}}</span>
 		<br>

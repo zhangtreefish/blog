@@ -64,3 +64,4 @@ By Dan Sanderson](https://books.google.com/books?id=4BIDCgAAQBAJ&pg=PA214&lpg=PA
 24. [create-index to solve the missing index error in deployment](http://stackoverflow.com/questions/37077734/app-engine-needindexerror-no-matching-index-found)<br />
 25. [splitting traffic: How Requests are Routed](https://cloud.google.com/appengine/docs/python/how-requests-are-routed)<br />
 26. [set version3 branch as master](http://stackoverflow.com/questions/2862590/how-to-replace-master-branch-in-git-entirely-from-another-branch)
+27. [over-riding webapp2.RequestHandler.__init__()](http://webapp2.readthedocs.io/en/latest/guide/handlers.html)

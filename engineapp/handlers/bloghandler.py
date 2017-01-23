@@ -19,6 +19,14 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
 
 class BlogHandler(webapp2.RequestHandler):
     '''this is the base handler for the blog application'''
+    def __init__(self, request, response):
+        # Set self.request, self.response and self.app.
+        self.initialize(request, response)
+
+        # ... add your custom initializations here ...
+        user_id = self.get_secure_cookie_val("user_id")
+        self.user = user_id and User.get_by_id(int(user_id))
+
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
 
@@ -33,10 +41,10 @@ class BlogHandler(webapp2.RequestHandler):
         cookie_val = self.request.cookies.get(cookie_name)
         return cookie_val and check_secure_val(cookie_val)
 
-    def initialize(self, *a, **kw):
-        webapp2.RequestHandler.initialize(self, *a, **kw)
-        user_id = self.get_secure_cookie_val("user_id")
-        self.user = user_id and User.get_by_id(int(user_id))
+    # def initialize(self, *a, **kw):
+    #     webapp2.RequestHandler.initialize(self, *a, **kw)
+    #     user_id = self.get_secure_cookie_val("user_id")
+    #     self.user = user_id and User.get_by_id(int(user_id))
 
     def registered_username(self, uname):
         """verify if a username is still available for use"""

@@ -88,6 +88,7 @@ class LogInHandler(bloghandler.BlogHandler):
         else:
             user_id = user_stored.key.id()
             models.User.update_lastLoggedIn(user_id)
+            self.user = user_stored
             self.login(user_id)
 
 

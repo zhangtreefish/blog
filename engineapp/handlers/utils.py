@@ -6,6 +6,7 @@ from secret import SECRET
 import random
 import string
 import hashlib
+from functools import wraps
 
 
 # Implement the hashing of user_id to be used in cookie
@@ -60,26 +61,27 @@ def valid_email(email):
 
 def verify_login(f):
     '''this is a decorator checking the logged in status of the user'''
-    def _wrapper(*a, **kw):
-        self = a[0]
+    @wraps(f)
+    def _lwrapper(self, *a, **kw):
         user = getattr(self, 'user')
         if user is None:
             message = """Only a logged in user can edit or delete own posts, like others'
-                    posts, or edit or delete own comments."""
+                    posts, or edit or delete own comments!"""
             self.redirect(webapp2.uri_for('login', message=message))
-        return f(*a, **kw)
-    return _wrapper
+        return f(self, *a, **kw)
+    return _lwrapper
 
 
 def validate_post_key(f):
     '''this is a decorator checking the validity of post_key_st'''
-    def _wrapper(*a, **kw):
+    @wraps(f)
+    def _pwrapper(self, post_key_st, *a, **kw):
         try:
-            post_key_st = kw['post_key_st']
+            # post_key_st = kw['post_key_st']
             post_key = ndb.Key(urlsafe=post_key_st)
             post = post_key.get()
         except:  # catch all
             post = None
         kw['post'] = post
-        return f(*a, **kw)
-    return _wrapper
+        return f(self, post_key_st, *a, **kw)
+    return _pwrapper

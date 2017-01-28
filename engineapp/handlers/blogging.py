@@ -19,11 +19,6 @@ class NewPostHandler(BlogHandler):
 
         my_kw = {}
 
-        if author is None:
-            message = """Only a logged in user can edit or delete own posts, like others'
-                    posts, or edit or delete own comments."""
-            self.redirect(webapp2.uri_for('login', message=message))
-
         if subject is None:
             my_kw['subject_err'] = 'Subject is a required field for blogs'
         if content is None:
@@ -57,7 +52,7 @@ class NewPostHandler(BlogHandler):
 
 class PostPermalinkHandler(BlogHandler):
     @validate_post_key
-    def get(self, post_key_st, **kw):
+    def get(self, post_key_st, *a, **kw):
         post = kw['post']
         if post:
             message = self.request.get('message')
@@ -79,7 +74,7 @@ class PostPermalinkHandler(BlogHandler):
 class NewCommentHandler(BlogHandler):
     @verify_login
     @validate_post_key
-    def get(self, post_key_st, **kw):
+    def get(self, post_key_st, *a, **kw):
         post = kw['post']
         if post:
             self.render('new_comment.html',
@@ -91,7 +86,7 @@ class NewCommentHandler(BlogHandler):
 
     @verify_login
     @validate_post_key
-    def post(self, post_key_st, **kw):
+    def post(self, post_key_st, *a, **kw):
         post = kw['post']
         if post:
             comment = self.request.get('newcomment')
@@ -115,7 +110,7 @@ class NewCommentHandler(BlogHandler):
 class EditCommentHandler(BlogHandler):
     @verify_login
     @validate_post_key
-    def post(self, post_key_st, comment_key_st, **kw):
+    def post(self, post_key_st, comment_key_st, *a, **kw):
         try:
             post = kw['post']
             if post and comment_key_st:
@@ -140,7 +135,7 @@ class EditCommentHandler(BlogHandler):
 class DeleteCommentHandler(BlogHandler):
     @verify_login
     @validate_post_key
-    def post(self, post_key_st, **kw):
+    def post(self, post_key_st, *a, **kw):
         try:
             post = kw['post']
             if post:
@@ -165,7 +160,7 @@ class DeleteCommentHandler(BlogHandler):
 class EditPostHandler(BlogHandler):
     @verify_login
     @validate_post_key
-    def get(self, post_key_st, **kw):
+    def get(self, post_key_st, *a, **kw):
         try:
             post = kw['post']
             if post:
@@ -186,13 +181,13 @@ class EditPostHandler(BlogHandler):
                                 content=post.content,
                                 tag=post.tag)
             else:
-                self.when_no_post_key('No such post')
+                self.when_no_post_key('No such post to edit')
         except Error as err:
             print("Error: {0}".format(err))
 
     @verify_login
     @validate_post_key
-    def post(self, post_key_st, **kw):
+    def post(self, post_key_st, *a, **kw):
         try:
             post = kw['post']
             if post:
@@ -224,7 +219,7 @@ class EditPostHandler(BlogHandler):
 class LikePostHandler(BlogHandler):
     @verify_login
     @validate_post_key
-    def post(self, post_key_st, **kw):
+    def post(self, post_key_st, *a, **kw):
         if self.user:
             post = kw['post']
             if post:
@@ -252,7 +247,7 @@ class LikePostHandler(BlogHandler):
 
 class DeletePostHandler(BlogHandler):
     @verify_login
-    def get(self):
+    def get(self, *a, **kw):
         if self.user:
             post_key_st = self.request.get('post_key_st')
             if post_key_st:
@@ -278,7 +273,7 @@ class DeletePostHandler(BlogHandler):
             self.when_not_authorized()
 
     @verify_login
-    def post(self):
+    def post(self, *a, **kw):
         try:
             if self.user:
                 post_key_st = self.request.get('post_key_st')
@@ -302,7 +297,7 @@ class DeletePostHandler(BlogHandler):
         except Error as err:
             print("Error: {0}".format(err))
 
-    def can_not_delete(self, post_key_st):
+    def can_not_delete(self, post_key_st, *a, **kw):
         message = '''Can not delete either because post
                     is already commented or that you did not author the post'''
         self.go_to_post(post_key_st, message)

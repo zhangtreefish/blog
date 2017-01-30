@@ -245,52 +245,47 @@ class LikePostHandler(BlogHandler):
 class DeletePostHandler(BlogHandler):
     @verify_login
     def get(self, *a, **kw):
-        if self.user:
+        post_key_st = self.request.get('post_key_st')
+        if post_key_st:
+            post_key = ndb.Key(urlsafe=post_key_st)
+            deleter_name = self.user and self.user.username
+            author_key = post_key.parent()
+            author = author_key.get()
+            comments = Comment.query_comments(post_key)
+            message = ''
+            if len(comments) == 0 and deleter_name == author.username:
+                post = post_key.get()
+                self.render(
+                    'post_delete.html',
+                    username=deleter_name,
+                    subject=post.subject,
+                    post_key_st=post_key_st
+                )
+            else:
+                self.can_not_delete(post_key_st)
+        else:
+            self.when_no_post_key('No such post to be deleted')
+
+
+    @verify_login
+    def post(self, *a, **kw):
+        try:
             post_key_st = self.request.get('post_key_st')
             if post_key_st:
                 post_key = ndb.Key(urlsafe=post_key_st)
-                deleter_name = self.user.username
+                deleter_name = self.user and self.user.username
                 author_key = post_key.parent()
                 author = author_key.get()
                 comments = Comment.query_comments(post_key)
                 message = ''
                 if len(comments) == 0 and deleter_name == author.username:
                     post = post_key.get()
-                    self.render(
-                        'post_delete.html',
-                        username=deleter_name,
-                        subject=post.subject,
-                        post_key_st=post_key_st
-                    )
+                    post.key.delete()
+                    self.redirect('/welcome')
                 else:
                     self.can_not_delete(post_key_st)
             else:
                 self.when_no_post_key('No such post to be deleted')
-        else:
-            self.when_not_authorized()
-
-    @verify_login
-    def post(self, *a, **kw):
-        try:
-            if self.user:
-                post_key_st = self.request.get('post_key_st')
-                if post_key_st:
-                    post_key = ndb.Key(urlsafe=post_key_st)
-                    deleter_name = self.user.username
-                    author_key = post_key.parent()
-                    author = author_key.get()
-                    comments = Comment.query_comments(post_key)
-                    message = ''
-                    if len(comments) == 0 and deleter_name == author.username:
-                        post = post_key.get()
-                        post.key.delete()
-                        self.redirect('/welcome')
-                    else:
-                        self.can_not_delete(post_key_st)
-                else:
-                    self.when_no_post_key('No such post to be deleted')
-            else:
-                self.when_not_authorized()
         except Error as err:
             print("Error: {0}".format(err))
 

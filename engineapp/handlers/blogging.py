@@ -116,7 +116,7 @@ class EditCommentHandler(BlogHandler):
             if post and comment_key_st:
                 comment_key = ndb.Key(urlsafe=comment_key_st)
                 comment = comment_key.get()
-                editor_name = self.user.username
+                editor_name = self.user and self.user.username
                 comment_author_name = comment.commenter
                 message = ''
                 if editor_name == comment_author_name:
@@ -158,8 +158,8 @@ class DeleteCommentHandler(BlogHandler):
 
 
 class EditPostHandler(BlogHandler):
-    @validate_post_key
     @verify_login
+    @validate_post_key
     def get(self, post_key_st, *a, **kw):
         try:
             post = kw['post']
@@ -220,29 +220,26 @@ class LikePostHandler(BlogHandler):
     @verify_login
     @validate_post_key
     def post(self, post_key_st, *a, **kw):
-        if self.user:
-            post = kw['post']
-            if post:
-                liker_name = self.user.username
-                author_key = post.key.parent()
-                author = author_key.get()
-                message = ''
-                # can only like others' post
-                if liker_name != author.username:
-                    # can only like a post once
-                    if liker_name in post.liked_by:
-                        message = 'You have given your one like'
-                    else:
-                        post.liked_by.append(liker_name)
-                        post.put()
-                        message = 'Thank you for liking!'
+        post = kw['post']
+        if post and self.user:
+            liker_name = self.user.username
+            author_key = post.key.parent()
+            author = author_key.get()
+            message = ''
+            # can only like others' post
+            if liker_name != author.username:
+                # can only like a post once
+                if liker_name in post.liked_by:
+                    message = 'You have given your one like'
                 else:
-                    message = 'Can not like own post'
-                self.go_to_post(post_key_st, message)
+                    post.liked_by.append(liker_name)
+                    post.put()
+                    message = 'Thank you for liking!'
             else:
-                self.when_no_post_key('No such post to be liked')
-        else:
-            self.when_not_authorized()
+                message = 'Can not like own post'
+            self.go_to_post(post_key_st, message)
+        elif post is None:
+            self.when_no_post_key('No such post to be liked')
 
 
 class DeletePostHandler(BlogHandler):

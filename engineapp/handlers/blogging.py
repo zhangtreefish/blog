@@ -139,7 +139,7 @@ class DeleteCommentHandler(BlogHandler):
         try:
             post = kw['post']
             if post:
-                deleter_name = self.user.username
+                deleter_name = self.user and self.user.username
                 comment_key_st = self.request.get('comment_key_st')
                 comment_key = ndb.Key(urlsafe=comment_key_st)
                 comment = comment_key.get()
@@ -158,13 +158,13 @@ class DeleteCommentHandler(BlogHandler):
 
 
 class EditPostHandler(BlogHandler):
-    @verify_login
     @validate_post_key
+    @verify_login
     def get(self, post_key_st, *a, **kw):
         try:
             post = kw['post']
             if post:
-                editor_name = self.user.username
+                editor_name = self.user and self.user.username
                 author_key = post.key.parent()
                 author = author_key.get()
                 message = ''
@@ -172,7 +172,7 @@ class EditPostHandler(BlogHandler):
                 if len(comments) != 0:
                     self.when_commented(post_key_st)
                 elif editor_name != author.username:
-                    message = 'Can only edit own post'
+                    message = 'Can only edit own post!'
                     self.go_to_post(post_key_st, message)
                 else:
                     self.render('post_edit.html',
@@ -185,8 +185,8 @@ class EditPostHandler(BlogHandler):
         except Error as err:
             print("Error: {0}".format(err))
 
-    @verify_login
     @validate_post_key
+    @verify_login
     def post(self, post_key_st, *a, **kw):
         try:
             post = kw['post']

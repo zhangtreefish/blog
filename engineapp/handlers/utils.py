@@ -65,7 +65,7 @@ def verify_login(f):
     def _lwrapper(self, *a, **kw):
         user = getattr(self, 'user')
         if user is None:
-            message = """Only a logged in user can edit or delete own posts, like others'
+            message = """Failure to verify login: Only a logged in user can edit or delete own posts, like others'
                     posts, or edit or delete own comments!"""
             self.redirect(webapp2.uri_for('login', message=message))
         return f(self, *a, **kw)

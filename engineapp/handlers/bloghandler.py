@@ -16,6 +16,19 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                # lstrip_blocks=True,
                                autoescape=True)
 
+import webapp2
+from functools import wraps
+# def verify_login(f):
+#     @wraps(f)
+#     def _wrapper(self, *args, **kw):
+#         # user = getattr(self, 'user')
+#         user = self.user
+#         if user is None:
+#             message = """Only a logged in user can edit or delete own posts, like others'
+#                     posts, or edit or delete own comments."""
+#             self.redirect(webapp2.uri_for('login', message=message))
+#         return f(self, *args, **kw)
+#     return _wrapper
 
 class BlogHandler(webapp2.RequestHandler):
     '''this is the base handler for the blog application'''
